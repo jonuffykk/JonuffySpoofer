@@ -1,10 +1,13 @@
 # Changelog
 
+## v1.0.2
+- Fixed plugin installation not working
+
 ## v1.0.1
 
 - Fixed job dependencies in release workflow
 - Fixed Discord webhook JSON for notifications
-- Updated Node.js to 22 in workflow
+- Updated Node.js to 24 in workflow
 - Adjusted artifactName to generate files correctly
 - Optimized build process for faster execution
 
