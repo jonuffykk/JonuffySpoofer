@@ -3,7 +3,7 @@
 Utility for swapping animation and audio assets in Roblox. Upload via Open Cloud and plugin for Roblox Studio.
 
 [![Latest Release](https://img.shields.io/github/v/release/jonuffykk/JonuffySpoofer)](https://github.com/jonuffykk/JonuffySpoofer/releases/latest)
-[![Discord](https://img.shields.io/discord/128880573?label=Discord&color=5865F2)](https://discord.gg/qMrJHxnS9T)
+[![Discord](https://img.shields.io/discord/1505666300993601728?label=Discord&color=5865F2&logo=discord&logoColor=white)](https://discord.gg/qMrJHxnS9T)
 
 ## Download
 
