@@ -15,6 +15,9 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   get-version:
     runs-on: ubuntu-latest
@@ -105,17 +108,21 @@ jobs:
           nxt = re.search(r'^##\s+', content[start:], re.MULTILINE)
           end = start + nxt.start() if nxt else len(content)
           lines = [l.strip() for l in content[start:end].splitlines() if l.strip() and not l.startswith('#')]
+          lines = lines[:10]
+          if len(lines) == 10:
+              lines.append("...")
           print('\n'.join(lines))
           PYEOF
           )
-          DESCRIPTION="${CHANGELOG}"$'\n\n'"Thank you for reading!"
+          RELEASE_URL="https://github.com/jonuffykk/JonuffySpoofer/releases/tag/${{ needs.get-version.outputs.version }}"
+          DESCRIPTION="${CHANGELOG}"$'\n'"[See full changelog](${RELEASE_URL})"$'\n\n'"Thank you for reading!"
           jq -n \
             --arg content "@everyone" \
-            --arg author "Jonu | Release ${{ needs.get-version.outputs.version }}" \
+            --arg author "Jonu | Update Release ${{ needs.get-version.outputs.version }}" \
             --arg icon "https://i.ibb.co/pj3qbyHf/aw.png" \
             --arg description "$DESCRIPTION" \
             --argjson color 8133317 \
-            '{content: $content, embeds: [{author: {name: $author, icon_url: $icon}, description: $description, color: $color, thumbnail: {url: $icon}}]}' \
+            '{content: $content, embeds: [{author: {name: $author, icon_url: $icon}, description: $description, color: $color, thumbnail: {url: $icon}, url: "'"$RELEASE_URL"'"}]}' \
           | curl -fsSL -X POST "$DISCORD_WEBHOOK_URL" \
               -H "Content-Type: application/json" \
               -d @-
