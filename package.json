@@ -1,6 +1,6 @@
 {
   "name": "jonuffyspoofer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "main.js",
   "description": "Animation & audio spoofing utility for Roblox",
   "author": "Jonuffy",
@@ -86,7 +86,7 @@
         }
       ]
     },
-    "artifactName": "JonuffySpoofer-${version}-${os}-${arch}.${ext}",
+    "artifactName": "JonuffySpoofer-${version}.${ext}",
     "forceCodeSigning": false,
     "publish": {
       "provider": "github",

@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.1
+
+- Fixed job dependencies in release workflow
+- Fixed Discord webhook JSON for notifications
+- Updated Node.js to 22 in workflow
+- Adjusted artifactName to generate files correctly
+- Optimized build process for faster execution
+
 ## v1.0.0
 
 Initial release of Jonuffy Spoofer.
