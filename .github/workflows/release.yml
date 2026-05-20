@@ -15,18 +15,17 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   get-version:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     outputs:
       version: ${{ steps.resolve.outputs.version }}
       is_prerelease: ${{ steps.resolve.outputs.is_prerelease }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - id: resolve
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -35,20 +34,15 @@ jobs:
             VERSION=$(grep -oP '^##\s+\K[v][0-9]+\.[0-9]+\.[0-9]+[^\s]*' CHANGELOG.md | head -1)
           fi
           if git rev-parse "$VERSION" >/dev/null 2>&1; then
-            echo "Tag $VERSION already exists, skipping release." && exit 1
+            echo "Tag $VERSION already exists, skipping." && exit 1
           fi
-          if [[ "$VERSION" =~ -(alpha|beta|rc|pre) ]]; then
-            echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
-          fi
+          [[ "$VERSION" =~ -(alpha|beta|rc|pre) ]] && IS_PRE=true || IS_PRE=false
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "is_prerelease=$IS_PRE" >> "$GITHUB_OUTPUT"
 
   build:
     runs-on: windows-latest
     needs: get-version
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -72,8 +66,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: [get-version, build]
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -85,52 +77,66 @@ jobs:
           git config user.email "github-actions@github.com"
           git tag -f ${{ needs.get-version.outputs.version }}
           git push origin ${{ needs.get-version.outputs.version }} --force
+      - id: changelog
+        run: |
+          VERSION="${{ needs.get-version.outputs.version }}"
+          BODY=$(python3 - <<'PYEOF'
+          import re, os, sys
+          v = os.environ['VERSION'].lstrip('v')
+          content = open('CHANGELOG.md', encoding='utf-8').read()
+          m = re.search(rf'^##\s+v?{re.escape(v)}\s*$', content, re.MULTILINE | re.IGNORECASE)
+          if not m: sys.exit(0)
+          start = m.end()
+          nxt = re.search(r'^##\s+', content[start:], re.MULTILINE)
+          end = start + nxt.start() if nxt else len(content)
+          print(content[start:end].strip())
+          PYEOF
+          )
+          echo "body<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ needs.get-version.outputs.version }}
       - uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ needs.get-version.outputs.version }}
-          name: ${{ needs.get-version.outputs.version }}
+          name: Jonuffy Spoofer ${{ needs.get-version.outputs.version }}
+          body: ${{ steps.changelog.outputs.body }}
           prerelease: ${{ needs.get-version.outputs.is_prerelease }}
           files: dist/*
 
   discord-notify:
     runs-on: ubuntu-latest
     needs: [get-version, release]
-    if: ${{ success() }}
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    if: success()
     steps:
       - uses: actions/checkout@v4
       - run: |
+          VERSION="${{ needs.get-version.outputs.version }}"
+          RELEASE_URL="https://github.com/jonuffykk/JonuffySpoofer/releases/tag/$VERSION"
           CHANGELOG=$(python3 - <<'PYEOF'
           import re, os, sys
           v = os.environ['VERSION'].lstrip('v')
           content = open('CHANGELOG.md', encoding='utf-8').read()
           m = re.search(rf'^##\s+v?{re.escape(v)}\s*$', content, re.MULTILINE | re.IGNORECASE)
-          if not m:
-              sys.exit(0)
+          if not m: sys.exit(0)
           start = m.end()
           nxt = re.search(r'^##\s+', content[start:], re.MULTILINE)
           end = start + nxt.start() if nxt else len(content)
-          lines = [l.strip() for l in content[start:end].splitlines() if l.strip() and not l.startswith('#')]
-          lines = lines[:10]
-          if len(lines) == 10:
-              lines.append("...")
+          lines = [l.strip() for l in content[start:end].splitlines() if l.strip() and not l.startswith('#')][:10]
+          if len(lines) == 10: lines.append("...")
           print('\n'.join(lines))
           PYEOF
           )
-          RELEASE_URL="https://github.com/jonuffykk/JonuffySpoofer/releases/tag/${{ needs.get-version.outputs.version }}"
-          DESCRIPTION="${CHANGELOG}"$'\n'"[See full changelog](${RELEASE_URL})"$'\n\n'"Thank you for reading!"
           jq -n \
             --arg content "@everyone" \
-            --arg author "Jonu | Update Release ${{ needs.get-version.outputs.version }}" \
+            --arg author "Jonu | Update Release $VERSION" \
             --arg icon "https://i.ibb.co/pj3qbyHf/aw.png" \
-            --arg description "$DESCRIPTION" \
+            --arg description "${CHANGELOG}"$'\n'"[See full changelog](${RELEASE_URL})"$'\n\n'"Thank you for reading!" \
             --argjson color 8133317 \
             '{content: $content, embeds: [{author: {name: $author, icon_url: $icon}, description: $description, color: $color, thumbnail: {url: $icon}, url: "'"$RELEASE_URL"'"}]}' \
-          | curl -fsSL -X POST "$DISCORD_WEBHOOK_URL" \
-              -H "Content-Type: application/json" \
-              -d @-
+          | curl -fsSL -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d @-
         env:
           VERSION: ${{ needs.get-version.outputs.version }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}

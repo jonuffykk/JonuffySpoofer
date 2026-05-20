@@ -8,6 +8,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onStatusUpdate: cb => ipcRenderer.on('update-status-message', (_e, ...args) => cb(...args)),
   onTransferUpdate: cb => ipcRenderer.on('transfer-update', (_e, ...args) => cb(...args)),
   onSpooferResult: cb => ipcRenderer.on('spoofer-result', (_e, ...args) => cb(...args)),
+  onStudioStatusUpdate: cb => ipcRenderer.on('studio-status-update', (_e, ...args) => cb(...args)),
+  onStudioScanResult: cb => ipcRenderer.on('studio-scan-result', (_e, ...args) => cb(...args)),
+  onStudioReplaceComplete: cb =>
+    ipcRenderer.on('studio-replace-complete', (_e, ...args) => cb(...args)),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   openExternal: url => ipcRenderer.send('open-external', url),
   runSpooferAction: data => ipcRenderer.send('run-spoofer-action', data),
@@ -15,7 +19,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   pauseSpoofer: () => ipcRenderer.send('spoofer-pause'),
   resumeSpoofer: () => ipcRenderer.send('spoofer-resume'),
   selectFolder: () => ipcRenderer.invoke('select-folder'),
-  fetchAudioQuota: cookie => ipcRenderer.invoke('fetch-audio-quota', { cookie }),
   fetchUserInfo: cookie => ipcRenderer.invoke('fetch-user-info', { cookie }),
   fetchUserGroups: cookie => ipcRenderer.invoke('fetch-user-groups', { cookie }),
   canUploadToGroup: (cookie, groupId, apiKey) =>
@@ -24,8 +27,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   clearSession: () => ipcRenderer.send('clear-session'),
   clearAppHistory: () => ipcRenderer.invoke('clear-app-history'),
   uninstallApp: () => ipcRenderer.invoke('uninstall-app'),
-  checkForUpdate: () => ipcRenderer.invoke('check-for-update'),
   installPlugin: () => ipcRenderer.invoke('install-plugin'),
   getPluginStatus: () => ipcRenderer.invoke('get-plugin-status'),
   openPluginsFolder: () => ipcRenderer.send('open-plugins-folder'),
+  getStudioConnection: () => ipcRenderer.invoke('get-studio-connection'),
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  onUpdateAvailable: cb => ipcRenderer.on('update-available', (_e, ...args) => cb(...args)),
 });

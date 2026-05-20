@@ -12,7 +12,7 @@
             colors: {
               brand: '#3b5bdb',
               brandHover: '#2f4ab8',
-              brandLight: '#eef2ff',
+              brandDim: '#eef2ff',
               danger: '#e03131',
               success: '#2f9e44',
               warn: '#f08c00',
@@ -26,222 +26,157 @@
       };
     </script>
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
       * {
         scrollbar-width: thin;
-        scrollbar-color: #e2e8f0 transparent;
+        scrollbar-color: #dee2e6 transparent;
       }
+
       *::-webkit-scrollbar {
-        width: 4px;
+        width: 3px;
       }
+
       *::-webkit-scrollbar-track {
         background: transparent;
       }
+
       *::-webkit-scrollbar-thumb {
-        background: #e2e8f0;
-        border-radius: 99px;
+        background: #dee2e6;
       }
-      body {
-        font-family: 'DM Sans', system-ui, sans-serif;
-      }
+
       .titlebar-drag {
         -webkit-app-region: drag;
       }
-      .titlebar-no-drag {
+
+      .no-drag {
         -webkit-app-region: no-drag;
       }
-      @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(8px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .fade-up {
-        animation: fadeUp 0.25s ease-out forwards;
-      }
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateX(8px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-      .slide-in {
-        animation: slideIn 0.2s ease-out forwards;
-      }
+
       .tab-content {
         display: none;
       }
+
       .tab-content.active {
         display: block;
       }
-      .nav-item {
-        transition: all 0.15s;
-      }
-      .nav-item.active {
-        background: #eef2ff;
-        color: #3b5bdb;
-      }
-      .nav-item.active svg {
-        color: #3b5bdb;
-      }
-      .toggle-track {
-        transition: background 0.2s;
-      }
+
       input[type='range'] {
         accent-color: #3b5bdb;
       }
-      .input-field {
-        transition:
-          border-color 0.15s,
-          box-shadow 0.15s;
-      }
-      .input-field:focus {
+
+      .field:focus {
         outline: none;
         border-color: #3b5bdb;
-        box-shadow: 0 0 0 3px #eef2ff;
       }
-      .btn-primary {
-        transition:
-          background 0.15s,
-          transform 0.1s;
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+
+        to {
+          opacity: 1;
+          transform: none;
+        }
       }
-      .btn-primary:active {
-        transform: scale(0.98);
-      }
-      .queue-pill {
-        font-size: 10px;
-        min-width: 18px;
-        height: 18px;
-      }
-      .status-dot {
-        display: inline-block;
-        flex-shrink: 0;
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-      }
-      .card {
-        transition: box-shadow 0.15s;
+
+      .page-enter {
+        animation: fadeIn 0.18s ease-out forwards;
       }
     </style>
   </head>
-  <body class="bg-gray-50 text-gray-900 h-screen flex flex-col overflow-hidden select-none">
+
+  <body
+    class="bg-white text-gray-900 h-screen flex flex-col overflow-hidden select-none font-sans text-sm antialiased"
+  >
     <div
       id="titlebar"
-      class="titlebar-drag h-12 bg-white border-b border-gray-100 flex items-center justify-between px-4 flex-shrink-0"
+      class="titlebar-drag h-11 bg-white border-b border-gray-200 flex items-center justify-between px-4 flex-shrink-0"
     >
-      <div class="flex items-center gap-2.5">
-        <img src="assets/logo.png" alt="" class="h-7 w-7 rounded-lg object-contain" />
-        <span class="font-semibold text-gray-800 text-sm">Jonuffy Spoofer</span>
-        <span id="version-text" class="text-xs text-gray-400 font-mono">v?</span>
+      <div class="flex items-center gap-2">
+        <img src="assets/logo.png" alt="" class="h-6 w-6 object-contain" />
+        <span class="font-semibold text-gray-800 text-[13px]">Jonuffy Spoofer</span>
+        <span id="version-text" class="text-[11px] text-gray-400 font-mono">v?</span>
       </div>
-      <div class="titlebar-no-drag flex items-center gap-1">
-        <button
-          id="check-update-btn"
-          class="p-1.5 text-gray-400 hover:text-brand hover:bg-brandLight rounded-md transition-all"
-          title="Check for updates"
-        >
-          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-        </button>
+      <div class="no-drag flex items-center gap-0.5">
         <button
           id="minimize-btn"
-          class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-all"
+          class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
         >
-          <i data-lucide="minus" class="w-4 h-4"></i>
+          <i data-lucide="minus" class="w-3.5 h-3.5"></i>
         </button>
         <button
           id="close-btn"
-          class="p-1.5 text-gray-400 hover:text-white hover:bg-danger rounded-md transition-all"
+          class="p-1.5 text-gray-400 hover:text-white hover:bg-danger transition-colors"
         >
-          <i data-lucide="x" class="w-4 h-4"></i>
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
         </button>
       </div>
     </div>
 
     <div class="flex flex-1 overflow-hidden">
-      <aside
-        class="w-52 bg-white border-r border-gray-100 flex flex-col flex-shrink-0 overflow-y-auto"
-      >
-        <nav class="p-3 flex flex-col gap-0.5 flex-1">
+      <aside class="w-48 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+        <nav class="p-2 flex flex-col gap-0.5 flex-1">
           <button
-            class="nav-item active w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600"
+            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
             data-nav="run"
           >
-            <i data-lucide="play" class="w-4 h-4 flex-shrink-0"></i> Run
+            <i data-lucide="zap" class="w-3.5 h-3.5 flex-shrink-0"></i> Run
           </button>
           <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600"
-            data-nav="login"
+            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
+            data-nav="credentials"
           >
-            <i data-lucide="key-round" class="w-4 h-4 flex-shrink-0"></i> Credentials
+            <i data-lucide="key-round" class="w-3.5 h-3.5 flex-shrink-0"></i> Credentials
           </button>
           <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600"
-            data-nav="queue"
+            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
+            data-nav="history"
           >
-            <i data-lucide="list" class="w-4 h-4 flex-shrink-0"></i>
-            <span>Queue</span>
-            <span
-              id="queue-badge"
-              class="hidden queue-pill ml-auto inline-flex items-center justify-center px-1.5 bg-brand text-white font-bold rounded-full"
-              >0</span
-            >
+            <i data-lucide="history" class="w-3.5 h-3.5 flex-shrink-0"></i> History
           </button>
           <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600"
-            data-nav="report"
-          >
-            <i data-lucide="bar-chart-2" class="w-4 h-4 flex-shrink-0"></i> Report
-          </button>
-          <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600"
+            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
             data-nav="plugin"
           >
-            <i data-lucide="puzzle" class="w-4 h-4 flex-shrink-0"></i> Plugin
+            <i data-lucide="puzzle" class="w-3.5 h-3.5 flex-shrink-0"></i> Plugin
           </button>
           <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600"
+            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
             data-nav="settings"
           >
-            <i data-lucide="settings" class="w-4 h-4 flex-shrink-0"></i> Settings
+            <i data-lucide="settings" class="w-3.5 h-3.5 flex-shrink-0"></i> Settings
           </button>
         </nav>
-        <div class="p-3 border-t border-gray-100 space-y-1">
+        <div class="p-2 border-t border-gray-200">
           <button
-            id="update-check-sidebar-btn"
-            class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-brand hover:bg-brandLight transition-all"
+            id="update-btn"
+            class="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
           >
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Update
+            <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Update
           </button>
           <button
             id="uninstall-btn"
-            class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-red-400 hover:text-red-600 hover:bg-red-50 transition-all"
+            class="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors text-left"
           >
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Uninstall
           </button>
-          <div id="sidebar-account" class="hidden px-2 py-2 flex items-center gap-2.5 min-w-0">
+          <div id="sidebar-account" class="hidden px-2 pt-2 flex items-center gap-2 min-w-0">
             <img
               id="sidebar-avatar"
               src=""
               alt=""
-              class="w-7 h-7 rounded-full object-cover bg-gray-100 flex-shrink-0"
+              class="w-6 h-6 object-cover bg-gray-100 flex-shrink-0"
             />
             <div class="min-w-0">
               <p
                 id="sidebar-display-name"
-                class="text-xs font-semibold text-gray-700 truncate leading-tight"
+                class="text-[11px] font-semibold text-gray-700 truncate leading-tight"
               ></p>
               <p id="sidebar-username" class="text-[10px] text-gray-400 truncate leading-tight"></p>
             </div>
@@ -249,174 +184,76 @@
         </div>
       </aside>
 
-      <main class="flex-1 overflow-y-auto">
-        <div id="page-run" class="tab-content active p-5 space-y-4 fade-up">
+      <main class="flex-1 overflow-y-auto bg-gray-50">
+        <div id="page-run" class="tab-content active p-4 space-y-3 page-enter">
           <div
-            id="session-banner"
-            class="hidden bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between"
+            id="studio-banner"
+            class="hidden bg-blue-50 border border-blue-200 px-3 py-2 flex items-center gap-2"
           >
-            <span class="text-sm text-amber-800"
-              >⚠️ <span id="session-pending-count"></span> asset(s) pending from last session.</span
-            >
-            <div class="flex gap-2">
-              <button
-                id="session-resume-btn"
-                class="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-semibold hover:bg-amber-600 transition-all"
-              >
-                Resume
-              </button>
-              <button
-                id="session-discard-btn"
-                class="px-3 py-1.5 bg-white border border-amber-200 text-amber-700 rounded-lg text-xs hover:bg-amber-50 transition-all"
-              >
-                Discard
-              </button>
-            </div>
+            <span
+              id="studio-status-dot"
+              class="w-1.5 h-1.5 bg-green-500 flex-shrink-0"
+              style="border-radius: 50%"
+            ></span>
+            <span class="text-[12px] text-blue-700"
+              >Studio connected — <span id="studio-place-name" class="font-semibold"></span
+            ></span>
           </div>
 
-          <div class="bg-white border border-gray-100 rounded-xl p-5 shadow-sm card">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex gap-1 p-1 bg-gray-100 rounded-lg">
-                <button
-                  id="tab-animation"
-                  class="mode-tab active px-3 py-1.5 rounded-md text-sm font-medium text-gray-700 bg-white shadow-sm transition-all"
-                  data-mode="animation"
-                >
-                  Animation
-                </button>
-                <button
-                  id="tab-sound"
-                  class="mode-tab px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition-all"
-                  data-mode="sound"
-                >
-                  Sound
-                </button>
-              </div>
-              <div
-                id="audio-quota-pill"
-                class="hidden text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-500 font-mono"
-              ></div>
-            </div>
-
-            <div class="relative">
+          <div class="bg-white border border-gray-200 p-4">
+            <div class="relative mb-3">
               <label
                 id="asset-label"
-                class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                 >Asset IDs</label
               >
               <textarea
                 id="animationId"
-                rows="4"
-                class="input-field w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 resize-none font-mono"
-                placeholder="123456 - Name - U: 123"
+                readonly
+                rows="5"
+                class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 placeholder-gray-400 resize-none font-mono transition-colors"
+                placeholder="Scan from Studio to populate"
               ></textarea>
-              <button
-                id="paste-animationId-btn"
-                class="absolute bottom-2.5 right-2.5 p-1.5 text-gray-400 hover:text-brand hover:bg-brandLight rounded-md transition-all titlebar-no-drag"
+              <div
+                id="scan-status-badge"
+                class="absolute top-8 right-2 px-2 py-0.5 bg-gray-100 text-gray-500 text-[11px] hidden"
               >
-                <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-
-            <div
-              id="audio-quota-info"
-              class="hidden mt-3 p-3 bg-blue-50 border border-blue-100 rounded-lg"
-            >
-              <p id="audio-quota-text" class="text-xs text-blue-700"></p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-3 gap-3">
-            <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm card">
-              <label class="flex items-center justify-between mb-1">
-                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                  >Download Only</span
-                >
-                <button
-                  id="download-only-toggle"
-                  class="toggle-track relative w-9 h-5 bg-gray-200 rounded-full"
-                  data-state="off"
-                >
-                  <span
-                    class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200"
-                  ></span>
-                </button>
-              </label>
-              <div id="download-folder-row" class="hidden mt-2 flex gap-1.5">
-                <input
-                  type="text"
-                  id="downloadFolder"
-                  readonly
-                  class="input-field flex-1 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-700 placeholder-gray-400"
-                  placeholder="Select folder..."
-                />
-                <button
-                  id="select-folder-btn"
-                  class="px-2 py-1.5 bg-brand text-white text-xs font-semibold rounded-lg hover:bg-brandHover transition-all"
-                >
-                  <i data-lucide="folder" class="w-3 h-3"></i>
-                </button>
+                Scanning...
               </div>
             </div>
 
-            <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm card">
-              <label class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                  >Enable Spoofing</span
-                >
-                <button
-                  id="enable-spoofing-toggle"
-                  class="toggle-track relative w-9 h-5 bg-brand rounded-full"
-                  data-state="on"
-                >
-                  <span
-                    class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 translate-x-4"
-                  ></span>
-                </button>
-              </label>
-              <p class="text-xs text-gray-400 mt-2">
-                Downloads and re-uploads assets to your account.
-              </p>
-            </div>
-
-            <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm card">
-              <label
-                class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
-                >Group</label
+            <div class="flex gap-2">
+              <button
+                id="scan-btn"
+                disabled
+                class="flex-1 py-2 bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-[12px] transition-colors"
               >
-              <select
-                id="groupId"
-                class="input-field w-full px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800"
+                <i data-lucide="search" class="w-3.5 h-3.5"></i> Scan Animations
+              </button>
+              <button
+                id="run-spoofer-btn"
+                disabled
+                class="flex-1 py-2 bg-brand text-white font-semibold hover:bg-brandHover disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-[12px] transition-colors"
               >
-                <option value="">Personal (optional)</option>
-              </select>
-              <p id="group-permission-warning" class="hidden text-xs text-red-500 mt-2"></p>
+                <i data-lucide="play" class="w-3.5 h-3.5"></i> Run Spoofer
+              </button>
+              <button
+                id="pause-spoofer-btn"
+                class="hidden px-3 py-2 bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 flex items-center gap-1.5 text-[12px] transition-colors"
+              >
+                <i data-lucide="pause" class="w-3.5 h-3.5"></i> Pause
+              </button>
             </div>
           </div>
 
-          <div class="flex gap-3">
-            <button
-              id="run-spoofer-btn"
-              class="btn-primary flex-1 py-3 bg-brand text-white font-semibold rounded-xl shadow-sm hover:bg-brandHover disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              <i data-lucide="zap" class="w-4 h-4"></i> Run Spoofer
-            </button>
-            <button
-              id="pause-spoofer-btn"
-              class="hidden px-4 py-3 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all flex items-center gap-2"
-            >
-              <i data-lucide="pause" class="w-4 h-4"></i> Pause
-            </button>
-          </div>
-
-          <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm card relative">
+          <div class="bg-white border border-gray-200 p-4">
             <div class="flex items-center justify-between mb-2">
-              <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide"
-                >Output</label
+              <label class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider"
+                >Output / Replace</label
               >
               <button
                 id="copy-output-btn"
-                class="p-1.5 text-gray-400 hover:text-brand hover:bg-brandLight rounded-md transition-all"
+                class="p-1 text-gray-400 hover:text-brand transition-colors"
               >
                 <i data-lucide="copy" class="w-3.5 h-3.5"></i>
               </button>
@@ -424,34 +261,49 @@
             <textarea
               id="output-data"
               readonly
-              rows="4"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-600 resize-none font-mono focus:outline-none"
-              placeholder="Output appears here..."
+              rows="5"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] text-gray-600 resize-none font-mono focus:outline-none"
+              placeholder="Mappings appear here after run..."
             ></textarea>
+            <div class="flex items-center gap-2 mt-2.5">
+              <select
+                id="groupId"
+                class="field flex-1 px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 transition-colors"
+              >
+                <option value="">Personal (default)</option>
+              </select>
+              <button
+                id="send-replace-btn"
+                disabled
+                class="flex-1 py-1.5 bg-brand text-white font-semibold hover:bg-brandHover disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-[12px] transition-colors"
+              >
+                <i data-lucide="send" class="w-3.5 h-3.5"></i> Send to Studio
+              </button>
+            </div>
+            <p id="group-permission-warning" class="hidden text-[11px] text-red-500 mt-1.5"></p>
           </div>
         </div>
 
-        <div id="page-login" class="tab-content p-5 space-y-4 fade-up">
-          <div class="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-4">Credentials</h2>
-            <div class="space-y-4">
+        <div id="page-credentials" class="tab-content p-4 space-y-3 page-enter">
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Credentials</h2>
+            <div class="space-y-3">
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                   >Roblox Cookie</label
                 >
                 <input
                   type="password"
                   id="robloxCookie"
                   autocomplete="off"
-                  class="input-field w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400"
-                  placeholder=".ROBLOSECURITY cookie"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] text-gray-800 placeholder-gray-400 transition-colors"
+                  placeholder=".ROBLOSECURITY value"
                 />
               </div>
-
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                   >Open Cloud API Key</label
                 >
                 <div class="flex gap-2">
@@ -459,12 +311,12 @@
                     type="password"
                     id="openCloudApiKey"
                     autocomplete="off"
-                    class="input-field flex-1 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400"
-                    placeholder="Required for uploads"
+                    class="field flex-1 px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] text-gray-800 placeholder-gray-400 transition-colors"
+                    placeholder="Requires Read & Write Assets permission"
                   />
                   <button
                     id="get-open-cloud-key-btn"
-                    class="px-3 py-2 bg-brand text-white text-xs font-semibold rounded-lg hover:bg-brandHover transition-all whitespace-nowrap"
+                    class="px-3 py-2 bg-brand text-white text-[12px] font-semibold hover:bg-brandHover transition-colors whitespace-nowrap"
                   >
                     Get Key
                   </button>
@@ -472,25 +324,21 @@
               </div>
             </div>
           </div>
-
-          <div
-            id="account-info-card"
-            class="hidden bg-white border border-gray-100 rounded-xl p-4 shadow-sm"
-          >
+          <div id="account-info-card" class="hidden bg-white border border-gray-200 p-4">
             <div class="flex items-center gap-3">
               <img
                 id="account-avatar"
                 src=""
                 alt=""
-                class="w-10 h-10 rounded-full object-cover bg-gray-100 flex-shrink-0"
+                class="w-9 h-9 object-cover bg-gray-100 flex-shrink-0"
               />
               <div class="min-w-0 flex-1">
                 <p
                   id="account-display-name"
-                  class="text-sm font-semibold text-gray-800 truncate"
+                  class="text-[13px] font-semibold text-gray-800 truncate"
                 ></p>
-                <p id="account-username" class="text-xs text-gray-400 truncate"></p>
-                <p id="account-userid" class="text-xs text-gray-300 truncate"></p>
+                <p id="account-username" class="text-[11px] text-gray-400 truncate"></p>
+                <p id="account-userid" class="text-[10px] text-gray-300 truncate"></p>
               </div>
               <div id="account-verified-badge" class="hidden flex-shrink-0">
                 <i data-lucide="check-circle" class="w-4 h-4 text-brand"></i>
@@ -499,123 +347,154 @@
           </div>
         </div>
 
-        <div id="page-queue" class="tab-content p-5 space-y-4 fade-up">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-semibold text-gray-800">Batch Queue</h2>
-              <p id="queue-summary" class="text-xs text-gray-400 mt-0.5">No active queue.</p>
-            </div>
-            <div class="flex gap-2">
-              <button
-                id="retry-failed-btn"
-                disabled
-                class="px-3 py-1.5 bg-brand text-white text-xs font-semibold rounded-lg hover:bg-brandHover disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-              >
-                Retry Failed
-              </button>
-              <button
-                id="clear-queue-btn"
-                class="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-all"
-              >
-                Clear
-              </button>
-            </div>
+        <div id="page-history" class="tab-content p-4 space-y-3 page-enter">
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-1">Run Report</h2>
+            <p id="run-report-mode" class="text-[11px] text-gray-400 mb-3">No run yet</p>
+            <div id="run-report-grid" class="grid grid-cols-3 gap-2"></div>
+            <div id="run-report-failures" class="mt-3"></div>
           </div>
-          <div id="queue-counts" class="flex flex-wrap gap-2"></div>
-          <div id="queue-list" class="space-y-2">
-            <div
-              class="text-center text-sm text-gray-400 py-12 bg-white border border-gray-100 rounded-xl"
-            >
-              Queue is empty.
+          <div class="bg-white border border-gray-200 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-[13px] font-semibold text-gray-800">Transfer Log</h2>
+              <div class="flex gap-2">
+                <input
+                  type="text"
+                  id="history-search"
+                  placeholder="Search..."
+                  class="px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand w-32"
+                />
+                <select
+                  id="history-filter"
+                  class="px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 focus:outline-none focus:border-brand"
+                >
+                  <option value="all">All</option>
+                  <option value="completed">Done</option>
+                  <option value="error">Failed</option>
+                  <option value="processing">Active</option>
+                </select>
+              </div>
+            </div>
+            <div id="queue-counts" class="flex flex-wrap gap-1.5 mb-2.5"></div>
+            <div id="queue-list" class="space-y-1.5 max-h-80 overflow-y-auto">
+              <div
+                class="text-center text-[13px] text-gray-400 py-10 border border-gray-100 bg-gray-50"
+              >
+                No transfers yet.
+              </div>
             </div>
           </div>
         </div>
 
-        <div id="page-report" class="tab-content p-5 space-y-4 fade-up">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-semibold text-gray-800">Run Report</h2>
-              <p id="run-report-mode" class="text-xs text-gray-400 mt-0.5">No run yet</p>
-            </div>
-          </div>
-          <div id="run-report-grid" class="grid grid-cols-3 gap-3"></div>
-          <div id="run-report-failures"></div>
-        </div>
-
-        <div id="page-plugin" class="tab-content p-5 space-y-4 fade-up">
-          <div class="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-1">Roblox Studio Plugin</h2>
-            <p class="text-xs text-gray-400 mb-4">
-              Installs the Jonuffy Spoofer plugin directly into Roblox Studio's local plugins
-              folder.
+        <div id="page-plugin" class="tab-content p-4 space-y-3 page-enter">
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-1">Roblox Studio Plugin</h2>
+            <p class="text-[12px] text-gray-400 mb-3">
+              Installs the Jonuffy Spoofer plugin into Roblox Studio's local plugins folder.
             </p>
             <div
               id="plugin-status-banner"
-              class="mb-4 p-3 rounded-lg border text-xs font-medium hidden"
+              class="hidden mb-3 px-3 py-2 border text-[12px] font-medium"
             ></div>
+            <div
+              id="plugin-path-row"
+              class="hidden mb-3 flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200"
+            >
+              <i data-lucide="folder" class="w-3.5 h-3.5 text-gray-400 flex-shrink-0"></i>
+              <span
+                id="plugin-path-text"
+                class="text-[11px] text-gray-500 font-mono truncate flex-1"
+              ></span>
+            </div>
             <div class="flex gap-2">
               <button
                 id="install-plugin-btn"
-                class="btn-primary flex-1 py-2.5 bg-brand text-white font-semibold rounded-xl hover:bg-brandHover flex items-center justify-center gap-2 text-sm"
+                class="flex-1 py-2 bg-brand text-white font-semibold hover:bg-brandHover flex items-center justify-center gap-1.5 text-[12px] transition-colors"
               >
-                <i data-lucide="download" class="w-4 h-4"></i> Install Plugin
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Install Plugin
+              </button>
+              <button
+                id="update-plugin-btn"
+                class="hidden flex-1 py-2 bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 flex items-center justify-center gap-1.5 text-[12px] transition-colors"
+              >
+                <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Update Plugin
               </button>
               <button
                 id="open-plugins-folder-btn"
-                class="px-4 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-all text-sm flex items-center gap-2"
+                class="px-3 py-2 bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors flex items-center gap-1.5 text-[12px]"
               >
-                <i data-lucide="folder-open" class="w-4 h-4"></i>
+                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </div>
-          <div class="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-3">How to use</h2>
-            <ol class="space-y-2 text-xs text-gray-500 list-none">
-              <li class="flex gap-2">
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">How to use</h2>
+            <ol class="space-y-2.5">
+              <li class="flex gap-2.5">
                 <span
-                  class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold"
+                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
                   >1</span
-                ><span
-                  >Click <strong class="text-gray-700">Install Plugin</strong> above — the plugin
-                  will be copied to your Roblox Studio plugins folder automatically.</span
+                >
+                <span class="text-[12px] text-gray-500"
+                  >Go to <strong class="text-gray-700">Credentials</strong> and paste your
+                  <code class="font-mono text-[11px]">.ROBLOSECURITY</code> cookie and an Open Cloud
+                  API key with
+                  <strong class="text-gray-700">Read &amp; Write Assets</strong> permission.</span
                 >
               </li>
-              <li class="flex gap-2">
+              <li class="flex gap-2.5">
                 <span
-                  class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold"
+                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
                   >2</span
-                ><span>Restart Roblox Studio if it was already open.</span>
-              </li>
-              <li class="flex gap-2">
-                <span
-                  class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold"
-                  >3</span
-                ><span
-                  >In Studio, click the <strong class="text-gray-700">Spoofer</strong> button in the
-                  Plugins toolbar.</span
+                >
+                <span class="text-[12px] text-gray-500"
+                  >Click <strong class="text-gray-700">Install Plugin</strong>. It copies
+                  automatically to your Roblox Studio plugins folder. Restart Studio if it is
+                  already open.</span
                 >
               </li>
-              <li class="flex gap-2">
+              <li class="flex gap-2.5">
                 <span
-                  class="w-5 h-5 rounded-full bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold"
+                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
+                  >3</span
+                >
+                <span class="text-[12px] text-gray-500"
+                  >Go to <strong class="text-gray-700">Run</strong> → click
+                  <strong class="text-gray-700">Scan Animations</strong>. The plugin scans all
+                  Animation objects and script sources in your place.</span
+                >
+              </li>
+              <li class="flex gap-2.5">
+                <span
+                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
                   >4</span
-                ><span
-                  >Use <strong class="text-gray-700">Scan IDs</strong> to collect asset IDs, paste
-                  them here, run the spoofer, then use
-                  <strong class="text-gray-700">Replace IDs</strong> in Studio.</span
+                >
+                <span class="text-[12px] text-gray-500"
+                  >Click <strong class="text-gray-700">Run Spoofer</strong>. Assets are downloaded
+                  and re-uploaded to your account or group via Open Cloud.</span
+                >
+              </li>
+              <li class="flex gap-2.5">
+                <span
+                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
+                  >5</span
+                >
+                <span class="text-[12px] text-gray-500"
+                  >Click <strong class="text-gray-700">Send to Studio</strong>. The plugin replaces
+                  all old IDs in the place instantly.</span
                 >
               </li>
             </ol>
           </div>
         </div>
 
-        <div id="page-settings" class="tab-content p-5 space-y-4 fade-up">
-          <div class="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-4">General</h2>
+        <div id="page-settings" class="tab-content p-4 space-y-3 page-enter">
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">General</h2>
             <div class="space-y-3">
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                   >Default Output Folder</label
                 >
                 <div class="flex gap-2">
@@ -623,39 +502,95 @@
                     type="text"
                     id="default-output-folder"
                     readonly
-                    class="input-field flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder-gray-400"
+                    class="field flex-1 px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] placeholder-gray-400 transition-colors"
                     placeholder="Optional"
                   />
                   <button
                     id="default-folder-browse-btn"
-                    class="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-all"
+                    class="px-3 py-2 bg-gray-100 text-gray-700 text-[12px] font-medium hover:bg-gray-200 transition-colors"
                   >
                     Browse
                   </button>
                 </div>
               </div>
-              <div class="flex items-center justify-between py-2">
-                <span class="text-sm text-gray-700">Auto-save sessions</span>
+              <div class="flex items-center justify-between py-1">
+                <span class="text-[13px] text-gray-700">Auto-save sessions</span>
                 <button
                   id="auto-save-toggle"
-                  class="toggle-track relative w-9 h-5 bg-brand rounded-full"
-                  data-state="on"
+                  class="toggle relative w-8 h-4 bg-brand"
+                  data-on="true"
                 >
                   <span
-                    class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 translate-x-4"
+                    class="absolute top-0.5 left-0.5 w-3 h-3 bg-white transition-transform duration-150"
                   ></span>
                 </button>
               </div>
             </div>
           </div>
 
-          <div class="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-4">Concurrency</h2>
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Spoofer Options</h2>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between py-1">
+                <div>
+                  <span class="text-[13px] text-gray-700">Download Only</span>
+                  <p class="text-[11px] text-gray-400 mt-0.5">
+                    Download assets without re-uploading
+                  </p>
+                </div>
+                <button
+                  id="download-only-toggle"
+                  class="toggle relative w-8 h-4 bg-gray-200"
+                  data-on="false"
+                >
+                  <span
+                    class="absolute top-0.5 left-0.5 w-3 h-3 bg-white transition-transform duration-150"
+                  ></span>
+                </button>
+              </div>
+              <div id="download-folder-row" class="hidden flex gap-2">
+                <input
+                  type="text"
+                  id="downloadFolder"
+                  readonly
+                  class="field flex-1 px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] text-gray-700 placeholder-gray-400 transition-colors"
+                  placeholder="Select folder..."
+                />
+                <button
+                  id="select-folder-btn"
+                  class="px-3 py-2 bg-brand text-white text-[12px] font-semibold hover:bg-brandHover transition-colors flex items-center gap-1"
+                >
+                  <i data-lucide="folder" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+              <div class="flex items-center justify-between py-1">
+                <div>
+                  <span class="text-[13px] text-gray-700">Enable Spoofing</span>
+                  <p class="text-[11px] text-gray-400 mt-0.5">
+                    Download and re-upload to your account
+                  </p>
+                </div>
+                <button
+                  id="enable-spoofing-toggle"
+                  class="toggle relative w-8 h-4 bg-brand"
+                  data-on="true"
+                >
+                  <span
+                    class="absolute top-0.5 left-0.5 w-3 h-3 bg-white transition-transform duration-150"
+                  ></span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Concurrency</h2>
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
-                  >Upload <span class="font-mono" id="upload-conc-val">10</span></label
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  >Upload —
+                  <span id="upload-conc-val" class="font-mono text-gray-600">10</span></label
                 >
                 <input
                   type="range"
@@ -663,13 +598,14 @@
                   min="1"
                   max="10"
                   value="10"
-                  class="w-full"
+                  class="w-full h-1"
                 />
               </div>
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
-                  >Download <span class="font-mono" id="download-conc-val">10</span></label
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  >Download —
+                  <span id="download-conc-val" class="font-mono text-gray-600">10</span></label
                 >
                 <input
                   type="range"
@@ -677,18 +613,18 @@
                   min="1"
                   max="25"
                   value="10"
-                  class="w-full"
+                  class="w-full h-1"
                 />
               </div>
             </div>
           </div>
 
-          <div class="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-4">Advanced</h2>
-            <div class="grid grid-cols-2 gap-3">
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Advanced</h2>
+            <div class="grid grid-cols-2 gap-2.5">
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                   >Max Place IDs</label
                 >
                 <input
@@ -697,12 +633,12 @@
                   value="10"
                   min="10"
                   max="50"
-                  class="input-field w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] transition-colors"
                 />
               </div>
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                   >Max Retries</label
                 >
                 <input
@@ -711,12 +647,12 @@
                   value="3"
                   min="1"
                   max="10"
-                  class="input-field w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] transition-colors"
                 />
               </div>
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                   >Upload Retries</label
                 >
                 <input
@@ -725,12 +661,12 @@
                   value="3"
                   min="1"
                   max="10"
-                  class="input-field w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] transition-colors"
                 />
               </div>
               <div>
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                   >Retry Delay (ms)</label
                 >
                 <input
@@ -740,107 +676,80 @@
                   min="1000"
                   max="60000"
                   step="1000"
-                  class="input-field w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] transition-colors"
                 />
               </div>
               <div class="col-span-2">
                 <label
-                  class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5"
+                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
                   >Override Place ID</label
                 >
                 <input
                   type="text"
                   id="overridePlaceId"
-                  class="input-field w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder-gray-400"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] placeholder-gray-400 transition-colors"
                   placeholder="Leave empty to auto-fetch"
                 />
               </div>
             </div>
           </div>
 
-          <div class="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-            <h2 class="text-sm font-semibold text-gray-800 mb-4">Data</h2>
+          <div class="bg-white border border-gray-200 p-4">
+            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Data</h2>
             <div class="flex gap-2">
               <button
                 id="clear-history-btn"
-                class="flex-1 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-1.5"
+                class="flex-1 py-2 bg-gray-100 text-gray-700 text-[12px] font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5"
               >
                 <i data-lucide="trash" class="w-3.5 h-3.5"></i> Clear History
               </button>
               <button
                 id="reset-settings-btn"
-                class="flex-1 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-all flex items-center justify-center gap-1.5"
+                class="flex-1 py-2 bg-gray-100 text-gray-700 text-[12px] font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5"
               >
-                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Settings
               </button>
             </div>
-            <div class="mt-3 pt-3 border-t border-gray-100">
-              <p class="text-xs text-gray-400 text-center">
-                Jonuffy Spoofer — Electron · Roblox Open Cloud API · Inspired by ISpooferMotion
-              </p>
-            </div>
+            <p class="text-[11px] text-gray-400 text-center mt-3 pt-3 border-t border-gray-100">
+              Jonuffy Spoofer — Electron · Roblox Open Cloud API
+            </p>
           </div>
         </div>
       </main>
     </div>
 
-    <div
-      class="bg-white border-t border-gray-100 px-4 py-1.5 flex items-center gap-2 flex-shrink-0"
-    >
-      <span id="status-dot" class="status-dot bg-gray-300"></span>
-      <span id="status-text" class="text-xs text-gray-500 font-medium">Ready</span>
-    </div>
-
-    <div
-      id="update-modal"
-      class="fixed inset-0 bg-black/20 z-50 hidden items-center justify-center"
-    >
-      <div class="bg-white rounded-2xl shadow-2xl p-6 w-80 text-center">
-        <div
-          class="w-10 h-10 bg-brandLight rounded-full flex items-center justify-center mx-auto mb-3"
-        >
-          <i data-lucide="arrow-up-circle" class="w-5 h-5 text-brand"></i>
-        </div>
-        <h2 class="text-base font-semibold text-gray-800 mb-1">Update Available</h2>
-        <p id="update-version-info" class="text-sm text-gray-500 mb-4">
-          A new version is available.
-        </p>
-        <button
-          id="update-download-btn"
-          class="btn-primary w-full py-2.5 bg-brand text-white font-semibold rounded-xl hover:bg-brandHover mb-2"
-        >
-          Download Update
-        </button>
-        <button
-          id="update-dismiss-btn"
-          class="w-full py-2.5 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-all text-sm"
-        >
-          Dismiss
-        </button>
-      </div>
+    <div class="bg-white border-t border-gray-200 px-4 h-8 flex items-center gap-2 flex-shrink-0">
+      <span
+        id="status-dot"
+        class="w-1.5 h-1.5 bg-gray-300 flex-shrink-0"
+        style="border-radius: 50%"
+      ></span>
+      <span id="status-text" class="text-[12px] text-gray-500">Ready</span>
     </div>
 
     <div
       id="uninstall-modal"
-      class="fixed inset-0 bg-black/20 z-50 hidden items-center justify-center"
+      class="fixed inset-0 bg-black/25 z-50 hidden items-center justify-center"
     >
-      <div class="bg-white rounded-2xl shadow-2xl p-6 w-80 text-center">
-        <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
-          <i data-lucide="alert-triangle" class="w-5 h-5 text-danger"></i>
+      <div class="bg-white border border-gray-200 p-6 w-72 text-center">
+        <div
+          class="w-8 h-8 bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-3"
+        >
+          <i data-lucide="alert-triangle" class="w-4 h-4 text-danger"></i>
         </div>
-        <h2 class="text-base font-semibold text-gray-800 mb-1">Uninstall?</h2>
-        <p class="text-sm text-gray-500 mb-4">
-          This will remove all data, shortcuts, and the Roblox Studio plugin.
+        <h2 class="text-[14px] font-semibold text-gray-800 mb-1">Uninstall?</h2>
+        <p class="text-[12px] text-gray-500 mb-4">
+          Removes all data, shortcuts, and the Studio plugin.
         </p>
         <button
           id="confirm-uninstall-btn"
-          class="btn-primary w-full py-2.5 bg-danger text-white font-semibold rounded-xl hover:bg-red-700 mb-2"
+          class="w-full py-2 bg-danger text-white text-[13px] font-semibold hover:bg-red-700 transition-colors mb-2"
         >
           Confirm Uninstall
         </button>
         <button
           id="cancel-uninstall-btn"
-          class="w-full py-2.5 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-all text-sm"
+          class="w-full py-2 bg-gray-100 text-gray-600 text-[13px] hover:bg-gray-200 transition-colors"
         >
           Cancel
         </button>
@@ -856,137 +765,102 @@
       const DEFAULT_SETTINGS = {
         defaultOutputFolder: '',
         autoSaveSessions: true,
+        downloadOnly: false,
+        enableSpoofing: true,
         uploadConcurrency: 10,
         downloadConcurrency: 10,
       };
 
-      function $id(id) {
-        return document.getElementById(id);
-      }
-      function readJson(key, fb) {
+      const $id = id => document.getElementById(id);
+      const readJson = (k, fb) => {
         try {
-          return JSON.parse(localStorage.getItem(key) || '') || fb;
+          return JSON.parse(localStorage.getItem(k) || '') || fb;
         } catch {
           return fb;
         }
-      }
-      function writeJson(key, val) {
-        localStorage.setItem(key, JSON.stringify(val));
-      }
-      function escapeHtml(v) {
-        return String(v).replace(
+      };
+      const writeJson = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+      const esc = v =>
+        String(v).replace(
           /[&<>'"]/g,
           c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]
         );
-      }
 
-      function clamp(input) {
-        if (!input) return 0;
-        const min = Number(input.min || 1),
-          max = Number(input.max || 999);
-        let v = parseInt(input.value, 10);
-        if (!isFinite(v)) v = min;
-        v = Math.max(min, Math.min(max, v));
-        input.value = String(v);
-        return v;
-      }
-
-      function makeToggle(btn, onClass, offClass) {
+      function setToggle(btn, on) {
         const thumb = btn.querySelector('span');
+        btn.dataset.on = on ? 'true' : 'false';
+        if (on) {
+          btn.classList.replace('bg-gray-200', 'bg-brand');
+          thumb.style.transform = 'translateX(16px)';
+        } else {
+          btn.classList.replace('bg-brand', 'bg-gray-200');
+          thumb.style.transform = 'translateX(0)';
+        }
+      }
+
+      function bindToggle(btn, onChange) {
         btn.addEventListener('click', () => {
-          const on = btn.dataset.state === 'on';
-          btn.dataset.state = on ? 'off' : 'on';
-          btn.className = btn.className.replace(on ? onClass : offClass, on ? offClass : onClass);
-          thumb.classList.toggle('translate-x-4', !on);
+          const next = btn.dataset.on !== 'true';
+          setToggle(btn, next);
+          onChange(next);
         });
       }
 
+      const toggleAutoSave = $id('auto-save-toggle');
       const toggleDownloadOnly = $id('download-only-toggle');
       const toggleSpoofing = $id('enable-spoofing-toggle');
-      const toggleAutoSave = $id('auto-save-toggle');
 
-      makeToggle(toggleDownloadOnly, 'bg-brand', 'bg-gray-200');
-      makeToggle(toggleSpoofing, 'bg-brand', 'bg-gray-200');
-      makeToggle(toggleAutoSave, 'bg-brand', 'bg-gray-200');
-
-      toggleDownloadOnly.addEventListener('click', () => {
-        const isOn = toggleDownloadOnly.dataset.state === 'on';
-        $id('download-folder-row').classList.toggle('hidden', !isOn);
-        if (isOn) {
-          toggleSpoofing.dataset.state = 'off';
-          const thumb = toggleSpoofing.querySelector('span');
-          toggleSpoofing.className = toggleSpoofing.className.replace('bg-brand', 'bg-gray-200');
-          thumb.classList.remove('translate-x-4');
+      bindToggle(toggleAutoSave, v => saveSettings({ autoSaveSessions: v }));
+      bindToggle(toggleSpoofing, v => saveSettings({ enableSpoofing: v }));
+      bindToggle(toggleDownloadOnly, v => {
+        $id('download-folder-row').classList.toggle('hidden', !v);
+        if (v) {
+          setToggle(toggleSpoofing, false);
           toggleSpoofing.disabled = true;
           toggleSpoofing.classList.add('opacity-40', 'cursor-not-allowed');
-          $id('groupId').disabled = true;
         } else {
           toggleSpoofing.disabled = false;
           toggleSpoofing.classList.remove('opacity-40', 'cursor-not-allowed');
-          $id('groupId').disabled = false;
         }
+        saveSettings({ downloadOnly: v });
       });
 
       document.querySelectorAll('.nav-item[data-nav]').forEach(btn => {
         btn.addEventListener('click', () => {
-          document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.nav-item').forEach(b => {
+            b.classList.remove('bg-brandDim', 'text-brand');
+            b.classList.add('text-gray-500');
+          });
           document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
-          btn.classList.add('active');
+          btn.classList.add('bg-brandDim', 'text-brand');
+          btn.classList.remove('text-gray-500');
           const page = $id('page-' + btn.dataset.nav);
           if (page) {
             page.classList.add('active');
-            page.classList.remove('slide-in');
+            page.classList.remove('page-enter');
             void page.offsetWidth;
-            page.classList.add('slide-in');
+            page.classList.add('page-enter');
           }
         });
       });
 
-      const modeTabs = document.querySelectorAll('.mode-tab');
-      let isSoundMode = false;
-      let animationModeContent = '';
-      let soundModeContent = '';
-      modeTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const currentContent = $id('animationId').value;
-          if (isSoundMode) {
-            soundModeContent = currentContent;
-          } else {
-            animationModeContent = currentContent;
-          }
-          modeTabs.forEach(t => {
-            t.classList.remove('active', 'bg-white', 'shadow-sm', 'text-gray-700');
-            t.classList.add('text-gray-500');
-          });
-          tab.classList.add('active', 'bg-white', 'shadow-sm', 'text-gray-700');
-          tab.classList.remove('text-gray-500');
-          const entering = tab.dataset.mode === 'sound';
-          if (isSoundMode && !entering) {
-            $id('audio-quota-pill').classList.add('hidden');
-            $id('audio-quota-pill').textContent = '';
-            $id('audio-quota-info').classList.add('hidden');
-          }
-          isSoundMode = entering;
-          $id('asset-label').textContent = isSoundMode ? 'Sound IDs' : 'Asset IDs';
-          $id('animationId').placeholder = isSoundMode
-            ? '123456 - Name - U: 123'
-            : '123456 - Name - U: 123';
-          $id('animationId').value = isSoundMode ? soundModeContent : animationModeContent;
-          if (isSoundMode) fetchAndShowQuota();
-        });
-      });
+      document
+        .querySelector('.nav-item[data-nav="run"]')
+        .classList.add('bg-brandDim', 'text-brand');
+      document.querySelector('.nav-item[data-nav="run"]').classList.remove('text-gray-500');
 
       function updateStatus(msg) {
         $id('status-text').textContent = msg || 'Ready';
         const dot = $id('status-dot');
-        if (!msg || msg === 'Ready') {
-          dot.className = 'status-dot bg-gray-300';
-          return;
-        }
-        if (/error|fail|invalid/i.test(msg)) dot.className = 'status-dot bg-red-500';
-        else if (/complete|done|success|copied/i.test(msg))
-          dot.className = 'status-dot bg-green-500';
-        else dot.className = 'status-dot bg-amber-400';
+        const c =
+          !msg || msg === 'Ready'
+            ? '#9ca3af'
+            : /error|fail|invalid/i.test(msg)
+              ? '#ef4444'
+              : /complete|done|success|copied|replaced/i.test(msg)
+                ? '#22c55e'
+                : '#f59e0b';
+        dot.style.background = c;
       }
 
       function readSettings() {
@@ -999,26 +873,17 @@
         return s;
       }
       function applySettings(s = readSettings()) {
-        if ($id('default-output-folder'))
-          $id('default-output-folder').value = s.defaultOutputFolder || '';
-        const autoSave = toggleAutoSave;
-        const isOn = s.autoSaveSessions !== false;
-        autoSave.dataset.state = isOn ? 'on' : 'off';
-        autoSave.querySelector('span').classList.toggle('translate-x-4', isOn);
-        autoSave.className = autoSave.className.replace(
-          isOn ? 'bg-gray-200' : 'bg-brand',
-          isOn ? 'bg-brand' : 'bg-gray-200'
-        );
+        $id('default-output-folder').value = s.defaultOutputFolder || '';
+        setToggle(toggleAutoSave, s.autoSaveSessions !== false);
+        setToggle(toggleDownloadOnly, s.downloadOnly === true);
+        $id('download-folder-row').classList.toggle('hidden', !s.downloadOnly);
+        setToggle(toggleSpoofing, s.enableSpoofing !== false);
         const uc = $id('uploadConcurrency');
-        if (uc) {
-          uc.value = s.uploadConcurrency || 10;
-          $id('upload-conc-val').textContent = uc.value;
-        }
+        uc.value = s.uploadConcurrency || 10;
+        $id('upload-conc-val').textContent = uc.value;
         const dc = $id('downloadConcurrency');
-        if (dc) {
-          dc.value = s.downloadConcurrency || 10;
-          $id('download-conc-val').textContent = dc.value;
-        }
+        dc.value = s.downloadConcurrency || 10;
+        $id('download-conc-val').textContent = dc.value;
       }
 
       function saveCredentials() {
@@ -1027,7 +892,6 @@
           apiKey: $id('openCloudApiKey').value,
         });
       }
-
       function loadCredentials() {
         const c = readJson(CREDS_KEY, {});
         if (typeof c.robloxCookie === 'string') $id('robloxCookie').value = c.robloxCookie;
@@ -1040,37 +904,6 @@
         refreshGroupDropdown();
       });
       $id('openCloudApiKey').addEventListener('change', saveCredentials);
-      $id('groupId').addEventListener('change', async () => {
-        localStorage.setItem(GROUP_ID_KEY, $id('groupId').value);
-        const selected = $id('groupId').value;
-        const warningEl = $id('group-permission-warning');
-        const runBtn = $id('run-spoofer-btn');
-        if (!selected) {
-          warningEl.classList.add('hidden');
-          runBtn.disabled = false;
-          return;
-        }
-        const cookie = $id('robloxCookie').value;
-        const apiKey = $id('openCloudApiKey').value;
-        if (!cookie) return;
-        if (!apiKey) {
-          warningEl.textContent = 'API key required to verify group permissions';
-          warningEl.classList.remove('hidden');
-          runBtn.disabled = true;
-          return;
-        }
-        warningEl.textContent = 'Checking permissions...';
-        warningEl.classList.remove('hidden');
-        runBtn.disabled = true;
-        const result = await window.electronAPI?.canUploadToGroup(cookie, selected, apiKey);
-        if (!result || !result.canUpload) {
-          warningEl.textContent = result?.reason || 'No upload permission for this group';
-          return;
-        }
-        warningEl.classList.add('hidden');
-        runBtn.disabled = false;
-      });
-
       $id('uploadConcurrency').addEventListener('input', e => {
         $id('upload-conc-val').textContent = e.target.value;
         saveSettings({ uploadConcurrency: parseInt(e.target.value) });
@@ -1080,159 +913,190 @@
         saveSettings({ downloadConcurrency: parseInt(e.target.value) });
       });
 
-      let _accountInfo = null;
+      $id('groupId').addEventListener('change', async () => {
+        localStorage.setItem(GROUP_ID_KEY, $id('groupId').value);
+        const sel = $id('groupId').value;
+        const warn = $id('group-permission-warning');
+        const run = $id('run-spoofer-btn');
+        if (!sel) {
+          warn.classList.add('hidden');
+          if (studioConnected) run.disabled = false;
+          return;
+        }
+        const cookie = $id('robloxCookie').value;
+        const apiKey = $id('openCloudApiKey').value;
+        if (!cookie) return;
+        if (!apiKey) {
+          warn.textContent = 'API key required to verify group permissions';
+          warn.classList.remove('hidden');
+          run.disabled = true;
+          return;
+        }
+        warn.textContent = 'Checking permissions...';
+        warn.classList.remove('hidden');
+        run.disabled = true;
+        const res = await window.electronAPI?.canUploadToGroup(cookie, sel, apiKey);
+        if (!res?.canUpload) {
+          warn.textContent = res?.reason || 'No upload permission for this group';
+          return;
+        }
+        warn.classList.add('hidden');
+        run.disabled = false;
+      });
 
       async function refreshAccountInfo() {
-        if (!window.electronAPI?.fetchUserInfo) return;
         const cookie = $id('robloxCookie').value;
         if (!cookie) {
           hideAccountInfo();
           return;
         }
-        const cardEl = $id('account-info-card');
-        const cardDN = $id('account-display-name');
-        const cardUN = $id('account-username');
-        cardDN.textContent = 'Loading...';
-        cardUN.textContent = '';
-        cardEl.classList.remove('hidden');
-        const info = await window.electronAPI.fetchUserInfo(cookie);
+        const card = $id('account-info-card');
+        $id('account-display-name').textContent = 'Loading...';
+        $id('account-username').textContent = '';
+        card.classList.remove('hidden');
+        const info = await window.electronAPI?.fetchUserInfo(cookie);
         if (!info || info.error) {
           hideAccountInfo();
           return;
         }
-        _accountInfo = info;
-        const sidebarEl = $id('sidebar-account');
-        const sidebarAvatar = $id('sidebar-avatar');
-        const sidebarDN = $id('sidebar-display-name');
-        const sidebarUN = $id('sidebar-username');
-        if (info.avatarUrl) sidebarAvatar.src = info.avatarUrl;
-        sidebarDN.textContent = info.displayName || info.name;
-        sidebarUN.textContent = '@' + info.name;
-        sidebarEl.classList.remove('hidden');
-        const cardAvatar = $id('account-avatar');
-        if (info.avatarUrl) cardAvatar.src = info.avatarUrl;
-        cardDN.textContent = info.displayName || info.name;
-        cardUN.textContent = '@' + info.name;
-        const cardUID = $id('account-userid');
-        if (cardUID) cardUID.textContent = info.id ? `ID: ${info.id}` : '';
-        const badge = $id('account-verified-badge');
-        if (badge) {
-          badge.classList.remove('hidden');
-          lucide.createIcons();
+        if (info.avatarUrl) {
+          $id('sidebar-avatar').src = info.avatarUrl;
+          $id('account-avatar').src = info.avatarUrl;
         }
+        $id('sidebar-display-name').textContent = info.displayName || info.name;
+        $id('sidebar-username').textContent = '@' + info.name;
+        $id('sidebar-account').classList.remove('hidden');
+        $id('account-display-name').textContent = info.displayName || info.name;
+        $id('account-username').textContent = '@' + info.name;
+        $id('account-userid').textContent = info.id ? 'ID: ' + info.id : '';
+        $id('account-verified-badge').classList.remove('hidden');
+        lucide.createIcons();
       }
 
       function hideAccountInfo() {
-        _accountInfo = null;
         $id('sidebar-account').classList.add('hidden');
         $id('account-info-card').classList.add('hidden');
-        const badge = $id('account-verified-badge');
-        if (badge) badge.classList.add('hidden');
+        $id('account-verified-badge').classList.add('hidden');
       }
 
       async function refreshGroupDropdown() {
         if (!window.electronAPI?.fetchUserGroups) return;
-        const groupSel = $id('groupId');
+        const sel = $id('groupId');
         const cookie = $id('robloxCookie').value;
         if (!cookie) {
-          groupSel.innerHTML = '<option value="">Personal (optional)</option>';
+          sel.innerHTML = '<option value="">Personal (default)</option>';
           return;
         }
-        const savedGroupId = localStorage.getItem(GROUP_ID_KEY);
-        groupSel.innerHTML = '<option value="">Loading groups...</option>';
-        groupSel.disabled = true;
+        const saved = localStorage.getItem(GROUP_ID_KEY);
+        sel.innerHTML = '<option value="">Loading groups...</option>';
+        sel.disabled = true;
         const groups = await window.electronAPI.fetchUserGroups(cookie);
-        groupSel.disabled = false;
-        if (!groups || groups.error || !Array.isArray(groups) || groups.length === 0) {
-          groupSel.innerHTML = '<option value="">Personal (optional)</option>';
+        sel.disabled = false;
+        if (!groups || groups.error || !Array.isArray(groups) || !groups.length) {
+          sel.innerHTML = '<option value="">Personal (default)</option>';
           return;
         }
-        groupSel.innerHTML =
-          '<option value="">Personal (optional)</option>' +
-          groups
-            .map(g => `<option value="${escapeHtml(g.id)}">${escapeHtml(g.name)}</option>`)
-            .join('');
-        if (savedGroupId && groupSel.querySelector(`option[value="${savedGroupId}"]`)) {
-          groupSel.value = savedGroupId;
-          groupSel.dispatchEvent(new Event('change'));
+        sel.innerHTML =
+          '<option value="">Personal (default)</option>' +
+          groups.map(g => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join('');
+        if (saved && sel.querySelector(`option[value="${saved}"]`)) {
+          sel.value = saved;
+          sel.dispatchEvent(new Event('change'));
         }
       }
 
       const queueItems = new Map();
       let lastFailedInput = '';
+      let activeFilter = 'all';
+      let searchQuery = '';
+
+      $id('history-search').addEventListener('input', e => {
+        searchQuery = e.target.value.toLowerCase();
+        renderQueue();
+      });
+      $id('history-filter').addEventListener('change', e => {
+        activeFilter = e.target.value;
+        renderQueue();
+      });
 
       function resetQueue() {
         queueItems.clear();
         lastFailedInput = '';
-        $id('retry-failed-btn').disabled = true;
         renderQueue();
       }
-      function upsertQueueItem(update) {
-        if (!update || !update.id) return;
-        queueItems.set(update.id, { ...(queueItems.get(update.id) || {}), ...update });
+      function upsertQueueItem(u) {
+        if (!u?.id) return;
+        queueItems.set(u.id, { ...(queueItems.get(u.id) || {}), ...u });
         renderQueue();
       }
+
       function renderQueue() {
-        const items = Array.from(queueItems.values());
+        let items = Array.from(queueItems.values());
         const counts = items.reduce((a, i) => {
           const s = i.status || 'queued';
           a[s] = (a[s] || 0) + 1;
           return a;
         }, {});
-        const total = items.length;
-        $id('queue-summary').textContent = total
-          ? `${total} item(s) · ${counts.completed || 0} done · ${(counts.processing || 0) + (counts.queued || 0)} active · ${counts.error || 0} failed`
-          : 'No active queue.';
-        const badge = $id('queue-badge');
-        badge.textContent = String(total);
-        badge.classList.toggle('hidden', total === 0);
-        const countEl = $id('queue-counts');
-        countEl.innerHTML = total
+        if (activeFilter !== 'all') items = items.filter(i => i.status === activeFilter);
+        if (searchQuery)
+          items = items.filter(
+            i =>
+              (i.name || '').toLowerCase().includes(searchQuery) ||
+              String(i.originalAssetId || '').includes(searchQuery)
+          );
+        const total = queueItems.size;
+        $id('queue-counts').innerHTML = total
           ? [
               ['Total', total],
-              ['Processing', counts.processing || 0],
-              ['Queued', counts.queued || 0],
+              ['Active', (counts.processing || 0) + (counts.queued || 0)],
               ['Done', counts.completed || 0],
               ['Failed', counts.error || 0],
             ]
               .filter(([, v]) => v > 0)
               .map(
                 ([l, v]) =>
-                  `<span class="px-2 py-0.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600">${escapeHtml(l)} <strong>${v}</strong></span>`
+                  `<span class="px-2 py-0.5 bg-white border border-gray-200 text-[11px] text-gray-600">${esc(l)} <strong>${v}</strong></span>`
               )
               .join('')
           : '';
         const list = $id('queue-list');
-        if (!total) {
+        if (!items.length) {
           list.innerHTML =
-            '<div class="text-center text-sm text-gray-400 py-12 bg-white border border-gray-100 rounded-xl">Queue is empty.</div>';
+            '<div class="text-center text-[13px] text-gray-400 py-10 border border-gray-100 bg-gray-50">' +
+            (total ? 'No items match filter.' : 'No transfers yet.') +
+            '</div>';
           return;
         }
-        const statusCls = {
+        const sCls = {
           processing: 'border-blue-100 bg-blue-50 text-blue-700',
           cooldown: 'border-amber-100 bg-amber-50 text-amber-700',
-          queued: 'border-gray-100 bg-white text-gray-600',
+          queued: 'border-gray-200 bg-white text-gray-600',
           error: 'border-red-100 bg-red-50 text-red-600',
           completed: 'border-green-100 bg-green-50 text-green-700',
         };
-        const sorted = [...items].sort((a, b) => {
-          const o = { processing: 0, cooldown: 1, queued: 2, error: 3, completed: 4 };
-          return (o[a.status] ?? 9) - (o[b.status] ?? 9);
-        });
+        const sorted = [...items].sort(
+          (a, b) =>
+            (({ processing: 0, cooldown: 1, queued: 2, error: 3, completed: 4 })[
+              a.status ?? 'queued'
+            ] ?? 9) -
+            ({ processing: 0, cooldown: 1, queued: 2, error: 3, completed: 4 }[
+              b.status ?? 'queued'
+            ] ?? 9)
+        );
         list.innerHTML =
           sorted
             .slice(0, 100)
             .map(item => {
               const s = item.status || 'queued',
-                cls = statusCls[s] || statusCls.queued;
+                cls = sCls[s] || sCls.queued;
               const p = Math.max(0, Math.min(100, Number(item.progress || 0)));
-              const assetId = item.originalAssetId || item.assetId || item.id || '';
+              const id = item.originalAssetId || item.assetId || item.id || '';
               const cool = item.cooldownRemaining ? ` · ${item.cooldownRemaining}s` : '';
-              return `<div class="p-3 rounded-xl border ${cls} space-y-1.5"><div class="flex items-center justify-between"><div class="min-w-0"><div class="text-sm font-medium truncate">${escapeHtml(item.name || assetId || 'Asset')}</div><div class="text-xs opacity-60 truncate">${escapeHtml(item.direction || 'asset')}${assetId ? ` · ${escapeHtml(assetId)}` : ''}${item.message ? ` · ${escapeHtml(item.message)}` : ''}</div></div><span class="text-xs font-semibold px-2 py-0.5 bg-white/70 rounded-full capitalize whitespace-nowrap">${escapeHtml(s)}${cool}</span></div><div class="h-1 bg-black/5 rounded-full overflow-hidden"><div class="h-full bg-current rounded-full transition-all duration-300" style="width:${p}%"></div></div></div>`;
+              return `<div class="px-3 py-2 border ${cls}"><div class="flex items-center justify-between mb-1.5"><div class="min-w-0"><div class="text-[12px] font-medium truncate">${esc(item.name || id || 'Asset')}</div><div class="text-[11px] opacity-60 truncate">${esc(item.direction || 'asset')}${id ? ` · ${esc(id)}` : ''}${item.message ? ` · ${esc(item.message)}` : ''}</div></div><span class="text-[11px] font-semibold px-2 py-0.5 bg-white/70 capitalize whitespace-nowrap ml-2">${esc(s)}${cool}</span></div><div class="h-0.5 bg-black/5 overflow-hidden"><div class="h-full bg-current transition-all duration-300" style="width:${p}%"></div></div></div>`;
             })
             .join('') +
           (sorted.length > 100
-            ? `<div class="text-center text-xs text-gray-400 py-2">+${sorted.length - 100} more</div>`
+            ? `<div class="text-center text-[11px] text-gray-400 py-2">+${sorted.length - 100} more</div>`
             : '');
       }
 
@@ -1241,406 +1105,365 @@
         $id('run-report-grid').innerHTML = '';
         $id('run-report-failures').innerHTML = '';
       }
-      function renderRunReport(summary) {
-        if (!summary) return;
-        const mode = summary.mode || (summary.downloadOnly ? 'Download only' : 'Download + Upload');
-        const dur = summary.durationSeconds ? `${summary.durationSeconds}s` : '0s';
-        $id('run-report-mode').textContent = `${mode} · ${dur}`;
-        const uploadTarget = Math.max(0, (summary.total ?? 0) - (summary.downloadFailures ?? 0));
+      function renderRunReport(s) {
+        if (!s) return;
+        $id('run-report-mode').textContent =
+          `${s.mode || (s.downloadOnly ? 'Download only' : 'Download + Upload')} · ${s.durationSeconds || 0}s`;
+        const ut = Math.max(0, (s.total ?? 0) - (s.downloadFailures ?? 0));
         const cards = [
-          ['Total', summary.total ?? 0],
-          ['Downloaded', `${summary.downloaded ?? 0}/${summary.total ?? 0}`],
-          ['Uploaded', summary.downloadOnly ? '—' : `${summary.uploaded ?? 0}/${uploadTarget}`],
-          ['Failures', (summary.downloadFailures || 0) + (summary.uploadFailures || 0)],
-          ['Cached', summary.cached || 0],
-          ['Skipped', summary.skippedUploads || 0],
+          ['Total', s.total ?? 0],
+          ['Downloaded', `${s.downloaded ?? 0}/${s.total ?? 0}`],
+          ['Uploaded', s.downloadOnly ? '—' : `${s.uploaded ?? 0}/${ut}`],
+          ['Failures', (s.downloadFailures || 0) + (s.uploadFailures || 0)],
+          ['Cached', s.cached || 0],
+          ['Skipped', s.skippedUploads || 0],
         ];
-        const getCardCls = (l, v) => {
-          const t = String(l).toLowerCase(),
+        const cls = (l, v) => {
+          const t = l.toLowerCase(),
             n = Number(String(v).split('/')[0]);
-          if (t.includes('fail') && n > 0) return 'bg-red-50 border-red-100 text-red-700';
-          if (t.includes('skip') && n > 0) return 'bg-amber-50 border-amber-100 text-amber-700';
-          if (t.includes('down') || t.includes('up') || t.includes('cache'))
-            return 'bg-green-50 border-green-100 text-green-700';
-          return 'bg-gray-50 border-gray-100 text-gray-700';
+          return t.includes('fail') && n > 0
+            ? 'bg-red-50 border-red-100 text-red-700'
+            : t.includes('skip') && n > 0
+              ? 'bg-amber-50 border-amber-100 text-amber-700'
+              : t.includes('down') || t.includes('up') || t.includes('cache')
+                ? 'bg-green-50 border-green-100 text-green-700'
+                : 'bg-gray-50 border-gray-100 text-gray-700';
         };
         $id('run-report-grid').innerHTML = cards
           .map(
             ([l, v]) =>
-              `<div class="p-3 rounded-xl border ${getCardCls(l, v)}"><span class="block text-[10px] uppercase tracking-wide opacity-60">${escapeHtml(l)}</span><strong class="block text-lg mt-0.5">${escapeHtml(v)}</strong></div>`
+              `<div class="p-2.5 border ${cls(l, v)}"><span class="block text-[10px] uppercase tracking-wider opacity-60 mb-0.5">${esc(l)}</span><strong class="block text-[16px]">${esc(String(v))}</strong></div>`
           )
           .join('');
-        const failures = Array.isArray(summary.failures) ? summary.failures : [];
-        const cats = summary.failureCategories || {};
-        if (!failures.length && !Object.keys(cats).length) {
+        const fails = Array.isArray(s.failures) ? s.failures : [];
+        const cats = s.failureCategories || {};
+        if (!fails.length && !Object.keys(cats).length) {
           $id('run-report-failures').innerHTML =
-            '<div class="text-center text-sm text-green-600 py-6 bg-green-50 border border-green-100 rounded-xl">No failures.</div>';
+            '<div class="text-center text-[12px] text-green-600 py-4 bg-green-50 border border-green-100 mt-3">No failures.</div>';
           return;
         }
         const catHtml = Object.keys(cats).length
-          ? `<div class="flex flex-wrap gap-2 mb-3">${Object.entries(cats)
+          ? `<div class="flex flex-wrap gap-1.5 mt-3 mb-2">${Object.entries(cats)
               .map(
                 ([k, v]) =>
-                  `<span class="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600">${escapeHtml(k)} · ${v}</span>`
+                  `<span class="px-2 py-0.5 bg-gray-100 text-[11px] text-gray-600">${esc(k)} · ${v}</span>`
               )
               .join('')}</div>`
           : '';
-        const rows = failures
-          .slice(0, 10)
-          .map(
-            f =>
-              `<div class="grid grid-cols-[70px_1fr] gap-2 py-2 border-b border-gray-50 last:border-0"><div class="text-xs text-brand uppercase tracking-wide">${escapeHtml(f.stage || 'Item')}</div><div class="min-w-0"><div class="text-sm text-gray-800 truncate">${escapeHtml(f.name || f.id || 'Asset')}</div><div class="text-xs text-gray-500 mt-0.5"><strong>${escapeHtml(f.category || 'Error')}</strong> — ${escapeHtml(f.reason || '')}</div></div></div>`
-          )
-          .join('');
-        $id('run-report-failures').innerHTML =
-          `<div class="bg-white border border-gray-100 rounded-xl p-4">${catHtml}${rows}${failures.length > 10 ? `<div class="text-xs text-gray-400 mt-2">+${failures.length - 10} more</div>` : ''}</div>`;
+        const failHtml = fails.length
+          ? `<div class="space-y-1.5">${fails
+              .slice(0, 20)
+              .map(
+                f =>
+                  `<div class="px-3 py-2 bg-red-50 border border-red-100 text-[11px] text-red-700"><strong>${esc(f.id || '?')}</strong> — ${esc(f.reason || f.error || 'Unknown')}</div>`
+              )
+              .join(
+                ''
+              )}${fails.length > 20 ? `<div class="text-[11px] text-gray-400 text-center py-1">+${fails.length - 20} more</div>` : ''}</div>`
+          : '';
+        $id('run-report-failures').innerHTML = catHtml + failHtml;
       }
-
-      function collectFormData(overrides = {}) {
-        return {
-          animationId: $id('animationId').value,
-          robloxCookie: $id('robloxCookie').value,
-          apiKey: $id('openCloudApiKey').value.trim(),
-          groupId: $id('groupId').value,
-          maxPlaceIds: parseInt($id('maxPlaceIds').value) || 10,
-          maxPlaceIdRetries: parseInt($id('maxPlaceIdRetries').value) || 3,
-          overridePlaceId: $id('overridePlaceId').value.trim() || null,
-          uploadRetries: parseInt($id('uploadRetries').value) || 3,
-          uploadRetryDelay: parseInt($id('uploadRetryDelay').value) || 5000,
-          uploadConcurrency: parseInt($id('uploadConcurrency').value) || 10,
-          downloadConcurrency: parseInt($id('downloadConcurrency').value) || 10,
-          autoSaveSession: toggleAutoSave.dataset.state === 'on',
-          enableSpoofing: toggleSpoofing.dataset.state === 'on',
-          spoofSounds: isSoundMode,
-          downloadOnly: toggleDownloadOnly.dataset.state === 'on',
-          downloadFolder: $id('downloadFolder').value,
-          ...overrides,
-        };
-      }
-
-      async function fetchAndShowQuota() {
-        if (!window.electronAPI?.fetchAudioQuota) return;
-        const cookie = $id('robloxCookie').value;
-        if (!cookie) return;
-        const pill = $id('audio-quota-pill');
-        pill.textContent = 'Loading quota...';
-        pill.classList.remove('hidden');
-        const q = await window.electronAPI.fetchAudioQuota(cookie);
-        if (!q || q.error) {
-          pill.textContent = 'Quota unavailable';
-          return;
-        }
-        let quota = null;
-        if (q.quotas?.length) {
-          const m = q.quotas.find(x => x.duration === 'Month');
-          if (m) quota = { remaining: m.capacity - m.usage, capacity: m.capacity };
-        }
-        if (!quota) {
-          pill.textContent = 'Quota unavailable';
-          return;
-        }
-        pill.textContent = `${quota.remaining}/${quota.capacity} uploads left`;
-        const infoEl = $id('audio-quota-info');
-        const textEl = $id('audio-quota-text');
-        const lines = ($id('animationId').value || '')
-          .split('\n')
-          .filter(l => /^\s*\d+\|/.test(l.trim())).length;
-        if (lines > quota.remaining) {
-          textEl.innerHTML = `⚠️ Quota: <strong>${quota.remaining}</strong> remaining. After <strong>${lines}</strong> uploads: <strong class="text-red-600">exceeded by ${lines - quota.remaining}</strong>`;
-        } else {
-          textEl.innerHTML = `✓ Quota: <strong>${quota.remaining}</strong> remaining. After <strong>${lines}</strong> uploads: <strong>${quota.remaining - lines}</strong> left`;
-        }
-        infoEl.classList.remove('hidden');
-      }
-
-      if (window.electronAPI) {
-        window.electronAPI.onTransferUpdate?.(upsertQueueItem);
-        window.electronAPI.onStatusUpdate?.(updateStatus);
-        window.electronAPI
-          .getAppVersion?.()
-          .then(v => {
-            $id('version-text').textContent = `v${v}`;
-          })
-          .catch(() => {});
-        window.electronAPI.onSpooferResult?.(result => {
-          if (result?.output !== undefined) $id('output-data').value = result.output;
-          lastFailedInput = result?.failedAnimationIdInput || '';
-          const retryBtn = $id('retry-failed-btn');
-          retryBtn.disabled = !lastFailedInput.trim();
-          retryBtn.textContent = lastFailedInput.trim()
-            ? `Retry Failed (${result.failedCount || 0})`
-            : 'Retry Failed';
-          if (result?.summary) renderRunReport(result.summary);
-          $id('run-spoofer-btn').disabled = false;
-          const pauseBtn = $id('pause-spoofer-btn');
-          pauseBtn.classList.add('hidden');
-        });
-      }
-
-      $id('run-spoofer-btn')?.addEventListener('click', () => {
-        if (!window.electronAPI?.runSpooferAction) return;
-        $id('run-spoofer-btn').disabled = true;
-        const pauseBtn = $id('pause-spoofer-btn');
-        pauseBtn.classList.remove('hidden');
-        pauseBtn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i> Pause';
-        lucide.createIcons();
-        updateStatus('Initiating...');
-        $id('output-data').value = '';
-        resetQueue();
-        resetRunReport();
-        const settings = readSettings();
-        if (
-          toggleDownloadOnly.dataset.state === 'on' &&
-          !$id('downloadFolder').value &&
-          settings.defaultOutputFolder
-        )
-          $id('downloadFolder').value = settings.defaultOutputFolder;
-        window.electronAPI.runSpooferAction(collectFormData());
-      });
 
       let _paused = false;
-      $id('pause-spoofer-btn')?.addEventListener('click', () => {
-        _paused = !_paused;
-        const btn = $id('pause-spoofer-btn');
-        if (_paused) {
-          window.electronAPI?.pauseSpoofer?.();
-          btn.innerHTML = '<i data-lucide="play" class="w-4 h-4"></i> Resume';
-        } else {
-          window.electronAPI?.resumeSpoofer?.();
-          btn.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i> Pause';
-        }
-        lucide.createIcons();
-      });
+      let studioConnected = false;
 
-      $id('retry-failed-btn')?.addEventListener('click', () => {
-        if (!lastFailedInput.trim()) return;
-        $id('animationId').value = lastFailedInput;
-        $id('output-data').value = '';
-        resetQueue();
-        resetRunReport();
-        $id('run-spoofer-btn').disabled = true;
-        $id('pause-spoofer-btn').classList.remove('hidden');
-        updateStatus('Retrying failed...');
-        window.electronAPI?.runSpooferAction?.(collectFormData({ animationId: lastFailedInput }));
+      $id('copy-output-btn').addEventListener('click', () => {
+        const t = $id('output-data').value;
+        if (!t) return;
+        navigator.clipboard.writeText(t);
+        updateStatus('Copied to clipboard');
       });
-
-      $id('clear-queue-btn')?.addEventListener('click', resetQueue);
-
-      $id('copy-output-btn')?.addEventListener('click', async () => {
-        const text = $id('output-data').value;
-        if (!text) return;
-        try {
-          await navigator.clipboard.writeText(text);
-          updateStatus('Copied!');
-        } catch {
-          $id('output-data').select();
-          document.execCommand('copy');
-          updateStatus('Copied!');
-        }
+      $id('minimize-btn').addEventListener('click', () => window.electronAPI?.minimize());
+      $id('close-btn').addEventListener('click', () => window.electronAPI?.close());
+      $id('uninstall-btn').addEventListener('click', () => {
+        $id('uninstall-modal').classList.remove('hidden');
+        $id('uninstall-modal').classList.add('flex');
       });
-
-      $id('paste-animationId-btn')?.addEventListener('click', async () => {
-        try {
-          const t = await navigator.clipboard.readText();
-          $id('animationId').value = t.trim();
-          updateStatus('Pasted.');
-        } catch {
-          updateStatus('Clipboard access denied.');
-        }
+      $id('cancel-uninstall-btn').addEventListener('click', () => {
+        $id('uninstall-modal').classList.add('hidden');
+        $id('uninstall-modal').classList.remove('flex');
       });
-
-      $id('select-folder-btn')?.addEventListener('click', async () => {
-        const f = await window.electronAPI?.selectFolder?.();
-        if (f) {
-          $id('downloadFolder').value = f;
-          updateStatus(`Folder: ${f}`);
-        }
-      });
-      $id('default-folder-browse-btn')?.addEventListener('click', async () => {
-        const f = await window.electronAPI?.selectFolder?.();
-        if (f) saveSettings({ defaultOutputFolder: f });
-      });
-
-      $id('get-open-cloud-key-btn')?.addEventListener('click', () =>
-        window.electronAPI?.openExternal?.('https://create.roblox.com/dashboard/credentials')
+      $id('confirm-uninstall-btn').addEventListener(
+        'click',
+        async () => await window.electronAPI?.uninstallApp()
       );
-      $id('minimize-btn')?.addEventListener('click', () => window.electronAPI?.minimize?.());
-      $id('close-btn')?.addEventListener('click', () => window.electronAPI?.close?.());
-
-      async function refreshPluginStatus() {
-        if (!window.electronAPI?.getPluginStatus) return;
-        const banner = $id('plugin-status-banner');
-        const installBtn = $id('install-plugin-btn');
-        const status = await window.electronAPI.getPluginStatus();
-        if (status.platform && status.platform !== 'win32') {
-          banner.textContent = 'Automatic install is only supported on Windows.';
-          banner.className =
-            'mb-4 p-3 rounded-lg border text-xs font-medium bg-amber-50 border-amber-200 text-amber-700';
-          banner.classList.remove('hidden');
-          if (installBtn) installBtn.disabled = true;
-          return;
+      $id('select-folder-btn').addEventListener('click', async () => {
+        const p = await window.electronAPI?.selectFolder();
+        if (p) $id('downloadFolder').value = p;
+      });
+      $id('default-folder-browse-btn').addEventListener('click', async () => {
+        const p = await window.electronAPI?.selectFolder();
+        if (p) {
+          $id('default-output-folder').value = p;
+          saveSettings({ defaultOutputFolder: p });
         }
-        if (status.installed) {
-          banner.textContent = `Plugin installed: ${status.file}`;
-          banner.className =
-            'mb-4 p-3 rounded-lg border text-xs font-medium bg-green-50 border-green-200 text-green-700';
-          banner.classList.remove('hidden');
-          if (installBtn)
-            installBtn.innerHTML =
-              '<i data-lucide="refresh-cw" class="w-4 h-4"></i> Reinstall Plugin';
-          lucide.createIcons();
-        } else {
-          banner.classList.add('hidden');
-          if (installBtn)
-            installBtn.innerHTML = '<i data-lucide="download" class="w-4 h-4"></i> Install Plugin';
-          lucide.createIcons();
-        }
-      }
+      });
+      $id('get-open-cloud-key-btn').addEventListener('click', () =>
+        window.electronAPI?.openExternal('https://create.roblox.com/dashboard/credentials')
+      );
+      $id('clear-history-btn').addEventListener('click', async () => {
+        if (!confirm('Clear all history and cached mappings?')) return;
+        await window.electronAPI?.clearAppHistory();
+        resetRunReport();
+        resetQueue();
+        updateStatus('History cleared');
+      });
+      $id('reset-settings-btn').addEventListener('click', () => {
+        if (!confirm('Reset all settings to defaults?')) return;
+        localStorage.removeItem(SETTINGS_KEY);
+        applySettings(DEFAULT_SETTINGS);
+        updateStatus('Settings reset');
+      });
+      $id('open-plugins-folder-btn').addEventListener('click', () =>
+        window.electronAPI?.openPluginsFolder()
+      );
 
-      $id('install-plugin-btn')?.addEventListener('click', async () => {
+      async function doInstallPlugin() {
         const btn = $id('install-plugin-btn');
         const banner = $id('plugin-status-banner');
         btn.disabled = true;
-        btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Installing...';
-        lucide.createIcons();
-        const result = await window.electronAPI?.installPlugin?.();
+        btn.innerHTML = 'Installing...';
+        banner.classList.add('hidden');
+        const result = await window.electronAPI?.installPlugin();
         btn.disabled = false;
-        if (result?.ok) {
-          banner.textContent = `Plugin installed to: ${result.path}`;
-          banner.className =
-            'mb-4 p-3 rounded-lg border text-xs font-medium bg-green-50 border-green-200 text-green-700';
-          banner.classList.remove('hidden');
-          btn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> Reinstall Plugin';
-          lucide.createIcons();
-          updateStatus('Plugin installed successfully.');
-        } else {
-          banner.textContent = `Install failed: ${result?.error || 'Unknown error'}`;
-          banner.className =
-            'mb-4 p-3 rounded-lg border text-xs font-medium bg-red-50 border-red-200 text-red-600';
-          banner.classList.remove('hidden');
-          btn.innerHTML = '<i data-lucide="download" class="w-4 h-4"></i> Install Plugin';
-          lucide.createIcons();
-          updateStatus('Plugin install failed.');
-        }
-      });
-
-      $id('open-plugins-folder-btn')?.addEventListener('click', () => {
-        window.electronAPI?.openPluginsFolder?.();
-      });
-
-      document.querySelector('[data-nav="plugin"]')?.addEventListener('click', refreshPluginStatus);
-
-      $id('clear-history-btn')?.addEventListener('click', async () => {
-        resetQueue();
-        resetRunReport();
-        $id('output-data').value = '';
-        lastFailedInput = '';
-        await window.electronAPI?.clearAppHistory?.();
-        updateStatus('History cleared.');
-      });
-      $id('reset-settings-btn')?.addEventListener('click', () => {
-        localStorage.removeItem(SETTINGS_KEY);
-        localStorage.removeItem(CREDS_KEY);
-        localStorage.removeItem(GROUP_ID_KEY);
-        $id('robloxCookie').value = '';
-        $id('openCloudApiKey').value = '';
-        applySettings(DEFAULT_SETTINGS);
-        hideAccountInfo();
-        $id('groupId').innerHTML = '<option value="">Personal (optional)</option>';
-        updateStatus('Settings reset.');
-      });
-      $id('auto-save-toggle')?.addEventListener('click', () =>
-        saveSettings({ autoSaveSessions: toggleAutoSave.dataset.state === 'on' })
-      );
-
-      async function checkForUpdates() {
-        updateStatus('Checking for updates...');
-        try {
-          const result = await window.electronAPI?.checkForUpdate?.();
-          if (!result || result.upToDate) {
-            updateStatus('Up to date.');
-            return;
-          }
-          $id('update-version-info').textContent =
-            `v${result.current} → v${result.latest} available.`;
-          const m = $id('update-modal');
-          m.classList.remove('hidden');
-          m.classList.add('flex');
-        } catch {
-          updateStatus('Ready');
-        }
+        await updatePluginButton();
+        lucide.createIcons();
+        banner.className = result?.ok
+          ? 'mb-3 px-3 py-2 border text-[12px] font-medium bg-green-50 border-green-200 text-green-700'
+          : 'mb-3 px-3 py-2 border text-[12px] font-medium bg-red-50 border-red-200 text-red-700';
+        banner.textContent = result?.ok
+          ? 'Plugin installed successfully.'
+          : result?.error || 'Failed to install plugin.';
+        banner.classList.remove('hidden');
       }
-      $id('check-update-btn')?.addEventListener('click', checkForUpdates);
-      $id('update-check-sidebar-btn')?.addEventListener('click', checkForUpdates);
-      $id('update-download-btn')?.addEventListener('click', () => {
-        window.electronAPI?.openExternal?.(
-          'https://github.com/jonuffykk/JonuffySpoofer/releases/latest'
-        );
-        const m = $id('update-modal');
-        m.classList.add('hidden');
-        m.classList.remove('flex');
-      });
-      $id('update-dismiss-btn')?.addEventListener('click', () => {
-        const m = $id('update-modal');
-        m.classList.add('hidden');
-        m.classList.remove('flex');
+      $id('install-plugin-btn').addEventListener('click', doInstallPlugin);
+      $id('update-plugin-btn').addEventListener('click', doInstallPlugin);
+
+      $id('pause-spoofer-btn').addEventListener('click', () => {
+        _paused = true;
+        $id('pause-spoofer-btn').classList.add('hidden');
+        $id('run-spoofer-btn').classList.remove('hidden');
+        window.electronAPI?.pauseSpoofer();
+        updateStatus('Paused');
       });
 
-      $id('uninstall-btn')?.addEventListener('click', () => {
-        const m = $id('uninstall-modal');
-        m.classList.remove('hidden');
-        m.classList.add('flex');
-      });
-      $id('cancel-uninstall-btn')?.addEventListener('click', () => {
-        const m = $id('uninstall-modal');
-        m.classList.add('hidden');
-        m.classList.remove('flex');
-      });
-      $id('confirm-uninstall-btn')?.addEventListener('click', async () => {
-        await window.electronAPI?.uninstallApp?.();
-      });
-
-      const sessionBanner = $id('session-banner');
-      let _pendingSession = null;
-      window.electronAPI
-        ?.checkSession?.()
-        .then(session => {
-          if (session?.animationIdInput) {
-            const pending = session.retryAnimationIdInput
-              ? session.retryAnimationIdInput.split('\n').filter(Boolean).length
-              : (session.totalCount || 0) - (session.completedMappings || []).length;
-            if (pending > 0) {
-              _pendingSession = session;
-              $id('session-pending-count').textContent = pending;
-              sessionBanner.classList.remove('hidden');
-            }
-          }
-        })
-        .catch(() => {});
-      $id('session-discard-btn')?.addEventListener('click', () => {
-        sessionBanner.classList.add('hidden');
-        _pendingSession = null;
-        window.electronAPI?.clearSession?.();
-      });
-      $id('session-resume-btn')?.addEventListener('click', () => {
-        if (!_pendingSession) return;
-        sessionBanner.classList.add('hidden');
-        const input =
-          _pendingSession.retryAnimationIdInput || _pendingSession.animationIdInput || '';
-        $id('animationId').value = input;
-        resetQueue();
-        $id('run-spoofer-btn').disabled = true;
+      $id('run-spoofer-btn').addEventListener('click', () => {
+        if (_paused) {
+          _paused = false;
+          window.electronAPI?.resumeSpoofer();
+          $id('run-spoofer-btn').classList.add('hidden');
+          $id('pause-spoofer-btn').classList.remove('hidden');
+          updateStatus('Resuming...');
+          return;
+        }
+        const s = readSettings();
+        window.electronAPI?.runSpooferAction({
+          animationId: $id('animationId').value,
+          robloxCookie: $id('robloxCookie').value,
+          apiKey: $id('openCloudApiKey').value,
+          groupId: $id('groupId').value,
+          downloadOnly: s.downloadOnly,
+          downloadFolder: $id('downloadFolder').value || s.defaultOutputFolder,
+          enableSpoofing: s.enableSpoofing,
+          spoofSounds: false,
+          autoSaveSession: s.autoSaveSessions,
+          maxPlaceIds: parseInt($id('maxPlaceIds').value, 10),
+          maxPlaceIdRetries: parseInt($id('maxPlaceIdRetries').value, 10),
+          uploadRetries: parseInt($id('uploadRetries').value, 10),
+          uploadRetryDelay: parseInt($id('uploadRetryDelay').value, 10),
+          overridePlaceId: $id('overridePlaceId').value,
+          uploadConcurrency: s.uploadConcurrency,
+          downloadConcurrency: s.downloadConcurrency,
+        });
+        $id('run-spoofer-btn').classList.add('hidden');
         $id('pause-spoofer-btn').classList.remove('hidden');
-        window.electronAPI?.resumeSession?.(
-          collectFormData({ animationId: input, resumeSession: true })
+        updateStatus('Starting...');
+      });
+
+      $id('scan-btn').addEventListener('click', async () => {
+        if (!studioConnected) {
+          updateStatus('Studio not connected');
+          return;
+        }
+        $id('scan-status-badge').classList.remove('hidden');
+        updateStatus('Requesting scan...');
+        try {
+          const r = await fetch('http://127.0.0.1:28476/request-scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ assetType: 'Animation' }),
+          });
+          updateStatus(r.ok ? 'Scan request sent' : 'Failed to send scan request');
+        } catch {
+          updateStatus('Failed to send scan request');
+        }
+      });
+
+      $id('send-replace-btn').addEventListener('click', async () => {
+        const mappings = $id('output-data').value.trim();
+        if (!mappings) {
+          updateStatus('No mappings to send');
+          return;
+        }
+        const conn = await window.electronAPI?.getStudioConnection();
+        if (!conn?.connected) {
+          updateStatus('Studio not connected');
+          return;
+        }
+        try {
+          const r = await fetch('http://127.0.0.1:28476/set-mappings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mappings: mappings
+                .split('\n')
+                .map(l => l.trim())
+                .filter(Boolean),
+            }),
+          });
+          updateStatus(r.ok ? 'Mappings sent to Studio' : 'Failed to send mappings');
+        } catch {
+          updateStatus('Failed to send mappings');
+        }
+      });
+
+      window.electronAPI?.onStatusUpdate(msg => updateStatus(msg));
+      window.electronAPI?.onTransferUpdate(u => upsertQueueItem(u));
+      window.electronAPI?.onSpooferResult(result => {
+        if (result.output) $id('output-data').value = result.output;
+        if (result.failedAnimationIdInput) lastFailedInput = result.failedAnimationIdInput;
+        if (result.summary) renderRunReport(result.summary);
+        $id('run-spoofer-btn').classList.remove('hidden');
+        $id('pause-spoofer-btn').classList.add('hidden');
+        _paused = false;
+        updateStatus(result.success ? 'Complete' : 'Failed');
+      });
+
+      window.electronAPI?.onStudioStatusUpdate(({ status, connection }) => {
+        studioConnected = status === 'connected';
+        $id('studio-banner').classList.toggle('hidden', !studioConnected);
+        if (studioConnected)
+          $id('studio-place-name').textContent = connection?.placeName || 'Unknown';
+        $id('scan-btn').disabled = !studioConnected;
+        $id('run-spoofer-btn').disabled = !studioConnected;
+        $id('send-replace-btn').disabled = !studioConnected;
+      });
+
+      window.electronAPI?.onStudioScanResult(data => {
+        $id('scan-status-badge').classList.add('hidden');
+        if (!data.results?.length) {
+          updateStatus(`No ${data.assetType}s found`);
+          return;
+        }
+        const current = $id('animationId').value;
+        const existing = new Set(
+          current
+            .split('\n')
+            .map(l => l.match(/^(\d+)/)?.[1])
+            .filter(Boolean)
+        );
+        const fresh = data.results.filter(l => {
+          const m = l.match(/^(\d+)/);
+          return m && !existing.has(m[1]);
+        });
+        if (fresh.length) {
+          $id('animationId').value = (current ? current + '\n' : '') + fresh.join('\n');
+          updateStatus(
+            `Scanned ${fresh.length} ${data.assetType}s (${data.results.length - fresh.length} skipped)`
+          );
+        } else {
+          updateStatus(`All ${data.assetType}s already in list`);
+        }
+      });
+
+      window.electronAPI?.onStudioReplaceComplete(data => {
+        updateStatus(
+          data?.success
+            ? `Replaced ${data.replacedCount || 0} instances in Studio`
+            : 'Replace failed in Studio'
         );
       });
 
-      loadCredentials();
-      applySettings(readSettings());
-      refreshAccountInfo().then(() => refreshGroupDropdown());
-      refreshPluginStatus();
-      updateStatus('Ready');
+      async function updatePluginButton(hasPluginUpdate) {
+        const status = await window.electronAPI?.getPluginStatus();
+        const btn = $id('install-plugin-btn');
+        const updateBtn = $id('update-plugin-btn');
+        const pathRow = $id('plugin-path-row');
+        const pathText = $id('plugin-path-text');
+        if (status?.installed) {
+          btn.innerHTML = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reinstall Plugin';
+          if (status.file) {
+            pathText.textContent = status.file;
+            pathRow.classList.remove('hidden');
+          }
+          if (hasPluginUpdate) updateBtn.classList.remove('hidden');
+          else updateBtn.classList.add('hidden');
+        } else {
+          btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Install Plugin';
+          pathRow.classList.add('hidden');
+          updateBtn.classList.add('hidden');
+        }
+        lucide.createIcons();
+      }
+
+      $id('update-btn').addEventListener('click', async () => {
+        const btn = $id('update-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Checking...';
+        lucide.createIcons();
+        updateStatus('Checking for updates...');
+        const res = await window.electronAPI?.checkForUpdates();
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Update';
+        lucide.createIcons();
+        if (!res) {
+          updateStatus('Update check failed');
+          return;
+        }
+        if (res.error) {
+          updateStatus('Update check failed');
+          return;
+        }
+        if (res.upToDate) {
+          updateStatus(`Up to date (${res.current})`);
+          return;
+        }
+        const ok = confirm(
+          `New version available: ${res.latest}\nCurrent: ${res.current}\n\nOpen the releases page to download?`
+        );
+        if (ok) window.electronAPI?.openExternal(res.releaseUrl);
+      });
+
+      window.electronAPI?.onUpdateAvailable(({ latest, releaseUrl }) => {
+        const btn = $id('update-btn');
+        btn.innerHTML = '<i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Update';
+        btn.classList.remove('text-gray-500');
+        btn.classList.add('text-brand');
+        lucide.createIcons();
+        updateStatus(`Update available: ${latest}`);
+        $id('update-plugin-btn').classList.remove('hidden');
+      });
+
+      window.electronAPI?.getAppVersion().then(v => {
+        $id('version-text').textContent = 'v' + v;
+      });
+
+      (async () => {
+        applySettings();
+        loadCredentials();
+        await refreshAccountInfo();
+        await refreshGroupDropdown();
+        await updatePluginButton();
+        updateStatus('Ready');
+        const upd = await window.electronAPI?.checkForUpdates();
+        if (upd && !upd.error && !upd.upToDate) {
+          const btn = $id('update-btn');
+          btn.classList.remove('text-gray-500');
+          btn.classList.add('text-brand');
+          await updatePluginButton(true);
+          updateStatus(`Update available: ${upd.latest}`);
+        }
+      })();
     </script>
   </body>
 </html>

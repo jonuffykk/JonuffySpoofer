@@ -1,24 +1,19 @@
 {
   "name": "jonuffyspoofer",
-  "version": "1.0.2",
+  "version": "1.4.6",
   "main": "main.js",
-  "description": "Animation & audio spoofing utility for Roblox",
+  "description": "Animation spoofing utility for Roblox",
   "author": "Jonuffy",
   "license": "GPL-3.0-or-later",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
-    "plugin": "node scripts/buildPlugin.js",
-    "release": "node scripts/releaseNote.js"
+    "plugin": "node scripts/builder.js"
   },
   "devDependencies": {
     "electron": "^42.1.0",
     "electron-builder": "^26.8.1",
     "@electron/rebuild": "^4.0.3"
-  },
-  "dependencies": {
-    "axios": "^1.9.0",
-    "keytar": "^7.9.0"
   },
   "build": {
     "appId": "com.github.jonuffykk.JonuffySpoofer",
@@ -46,45 +41,9 @@
       }
     ],
     "win": {
-      "target": [
-        "portable"
-      ],
+      "target": "portable",
       "icon": "assets/logo.ico",
       "signAndEditExecutable": false
-    },
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "icon": "assets/logo.png",
-      "category": "public.app-category.utilities",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist"
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
-      "icon": "assets/logo.png",
-      "category": "Utility"
-    },
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
     },
     "artifactName": "JonuffySpoofer-${version}.${ext}",
     "forceCodeSigning": false,
