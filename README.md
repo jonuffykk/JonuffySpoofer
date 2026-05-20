@@ -3,7 +3,7 @@
 Desktop utility for re-uploading animation assets on Roblox. Connects directly to Roblox Studio via a local plugin to scan, spoof, and replace animation IDs — all without leaving the app.
 
 [![Latest Release](https://img.shields.io/github/v/release/jonuffykk/JonuffySpoofer)](https://github.com/jonuffykk/JonuffySpoofer/releases/latest)
-[![Discord](https://img.shields.io/discord/128880573?label=Discord&color=5865F2)](https://discord.gg/qMrJHxnS9T)
+[![Discord](https://img.shields.io/discord/1505666300993601728?label=Discord&color=5865F2&logo=discord&logoColor=white)](https://discord.gg/qMrJHxnS9T)
 
 ## Download
 
