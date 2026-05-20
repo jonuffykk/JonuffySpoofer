@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.4.6
+## v1.4.7
 
 - Removed Sound/audio spoofing mode — animation-only
 - Removed audio quota display and Sound mode tab from the Run page
@@ -34,7 +34,6 @@
 - Standardized spacing, font sizes, and alignment across all pages
 - Removed unused dependencies (axios, keytar) from package.json
 - Removed macOS and Linux build configs — Windows portable only
-- Moved FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 to global env in release workflow
 - Discord webhook notification extracts changelog section automatically on release
 
 ## v1.0.2
