@@ -32,7 +32,10 @@ function send(res, status, data) {
 }
 
 function startServer(port = 28476) {
-  if (server) return server;
+  if (server) {
+    server.close();
+    studioConnection = null;
+  }
 
   server = http.createServer(async (req, res) => {
     const { pathname } = new URL(req.url, `http://${req.headers.host}`);
@@ -49,6 +52,8 @@ function startServer(port = 28476) {
       }
 
       if (pathname === '/connect' && req.method === 'POST') {
+        studioConnection = null;
+        global.currentMappings = [];
         const data = await parseBody(req);
         studioConnection = {
           connected: true,
@@ -58,6 +63,10 @@ function startServer(port = 28476) {
         };
         callbacks.onStatusUpdate?.('connected', studioConnection);
         return send(res, 200, { success: true });
+      }
+
+      if (!studioConnection) {
+        return send(res, 401, { error: 'Unauthorized' });
       }
 
       if (pathname === '/disconnect' && req.method === 'POST') {

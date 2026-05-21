@@ -12,6 +12,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onStudioScanResult: cb => ipcRenderer.on('studio-scan-result', (_e, ...args) => cb(...args)),
   onStudioReplaceComplete: cb =>
     ipcRenderer.on('studio-replace-complete', (_e, ...args) => cb(...args)),
+  getRunsHistory: () => ipcRenderer.invoke('get-runs-history'),
+  clearRunsHistory: () => ipcRenderer.invoke('clear-runs-history'),
+  deleteRun: id => ipcRenderer.invoke('delete-run', id),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   openExternal: url => ipcRenderer.send('open-external', url),
   runSpooferAction: data => ipcRenderer.send('run-spoofer-action', data),
@@ -32,5 +35,4 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openPluginsFolder: () => ipcRenderer.send('open-plugins-folder'),
   getStudioConnection: () => ipcRenderer.invoke('get-studio-connection'),
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
-  onUpdateAvailable: cb => ipcRenderer.on('update-available', (_e, ...args) => cb(...args)),
 });

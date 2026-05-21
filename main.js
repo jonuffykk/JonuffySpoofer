@@ -7,7 +7,7 @@ const { startServer, setStudioCallbacks } = require('./modules/connect');
 
 function sendToRenderer(channel, payload) {
   const win = getMainWindow();
-  if (!win?.isDestroyed() === false) return;
+  if (!win || win.isDestroyed()) return;
   win.webContents?.send(channel, payload);
 }
 

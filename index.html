@@ -216,7 +216,7 @@
               ></textarea>
               <div
                 id="scan-status-badge"
-                class="absolute top-8 right-2 px-2 py-0.5 bg-gray-100 text-gray-500 text-[11px] hidden"
+                class="absolute top-8 right-2 px-2 py-0.5 bg-brand/10 text-brand text-[11px] font-medium hidden"
               >
                 Scanning...
               </div>
@@ -244,6 +244,27 @@
                 <i data-lucide="pause" class="w-3.5 h-3.5"></i> Pause
               </button>
             </div>
+          </div>
+
+          <div id="scan-progress-card" class="hidden bg-white border border-gray-200 p-3">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider"
+                >Scanning</span
+              >
+              <span id="scan-progress-pct" class="text-[11px] font-mono text-brand font-semibold"
+                >0%</span
+              >
+            </div>
+            <div class="h-1 bg-gray-100 overflow-hidden">
+              <div
+                id="scan-progress-bar"
+                class="h-full bg-brand transition-all duration-200"
+                style="width: 0%"
+              ></div>
+            </div>
+            <p id="scan-progress-found" class="text-[11px] text-gray-400 mt-1.5">
+              Finding animations...
+            </p>
           </div>
 
           <div class="bg-white border border-gray-200 p-4">
@@ -348,6 +369,39 @@
         </div>
 
         <div id="page-history" class="tab-content p-4 space-y-3 page-enter">
+          <div class="bg-white border border-gray-200 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-[13px] font-semibold text-gray-800">Saved Sessions</h2>
+              <button
+                id="refresh-sessions-btn"
+                class="p-1 text-gray-400 hover:text-brand transition-colors"
+              >
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <select
+              id="history-runs-dropdown"
+              class="field w-full px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 mb-2.5 transition-colors"
+            >
+              <option value="">— no saved sessions —</option>
+            </select>
+            <div class="flex gap-2">
+              <button
+                id="load-session-btn"
+                disabled
+                class="flex-1 py-1.5 bg-brand text-white text-[12px] font-semibold hover:bg-brandHover disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> Load Session
+              </button>
+              <button
+                id="delete-session-btn"
+                disabled
+                class="px-3 py-1.5 bg-gray-100 text-red-500 text-[12px] font-medium hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
+              >
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
           <div class="bg-white border border-gray-200 p-4">
             <h2 class="text-[13px] font-semibold text-gray-800 mb-1">Run Report</h2>
             <p id="run-report-mode" class="text-[11px] text-gray-400 mb-3">No run yet</p>
@@ -841,6 +895,7 @@
             void page.offsetWidth;
             page.classList.add('page-enter');
           }
+          if (btn.dataset.nav === 'history') refreshRunsDropdown();
         });
       });
 
@@ -935,13 +990,17 @@
         warn.textContent = 'Checking permissions...';
         warn.classList.remove('hidden');
         run.disabled = true;
-        const res = await window.electronAPI?.canUploadToGroup(cookie, sel, apiKey);
-        if (!res?.canUpload) {
-          warn.textContent = res?.reason || 'No upload permission for this group';
-          return;
+        try {
+          const res = await window.electronAPI?.canUploadToGroup(cookie, sel, apiKey);
+          if (!res?.canUpload) {
+            warn.textContent = res?.reason || 'No upload permission for this group';
+            return;
+          }
+          warn.classList.add('hidden');
+          run.disabled = false;
+        } catch {
+          warn.textContent = 'Permission check failed';
         }
-        warn.classList.add('hidden');
-        run.disabled = false;
       });
 
       async function refreshAccountInfo() {
@@ -1204,8 +1263,10 @@
       $id('clear-history-btn').addEventListener('click', async () => {
         if (!confirm('Clear all history and cached mappings?')) return;
         await window.electronAPI?.clearAppHistory();
+        await window.electronAPI?.clearRunsHistory();
         resetRunReport();
         resetQueue();
+        await refreshRunsDropdown();
         updateStatus('History cleared');
       });
       $id('reset-settings-btn').addEventListener('click', () => {
@@ -1305,25 +1366,34 @@
           updateStatus('No mappings to send');
           return;
         }
+        const mappingLines = mappings
+          .split('\n')
+          .map(l => l.trim())
+          .filter(Boolean);
+        if (!mappingLines.length) {
+          updateStatus('No valid mappings to send');
+          return;
+        }
         const conn = await window.electronAPI?.getStudioConnection();
         if (!conn?.connected) {
           updateStatus('Studio not connected');
           return;
         }
+        $id('send-replace-btn').disabled = true;
+        updateStatus('Replacing in Studio...');
         try {
           const r = await fetch('http://127.0.0.1:28476/set-mappings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              mappings: mappings
-                .split('\n')
-                .map(l => l.trim())
-                .filter(Boolean),
-            }),
+            body: JSON.stringify({ mappings: mappingLines }),
           });
-          updateStatus(r.ok ? 'Mappings sent to Studio' : 'Failed to send mappings');
+          if (!r.ok) {
+            updateStatus('Failed to send mappings');
+            $id('send-replace-btn').disabled = false;
+          }
         } catch {
           updateStatus('Failed to send mappings');
+          $id('send-replace-btn').disabled = false;
         }
       });
 
@@ -1337,51 +1407,126 @@
         $id('pause-spoofer-btn').classList.add('hidden');
         _paused = false;
         updateStatus(result.success ? 'Complete' : 'Failed');
+        refreshRunsDropdown();
       });
 
       window.electronAPI?.onStudioStatusUpdate(({ status, connection }) => {
         studioConnected = status === 'connected';
-        $id('studio-banner').classList.toggle('hidden', !studioConnected);
-        if (studioConnected)
+        const banner = $id('studio-banner');
+        banner.classList.toggle('hidden', !studioConnected);
+        if (studioConnected) {
           $id('studio-place-name').textContent = connection?.placeName || 'Unknown';
+          $id('studio-status-dot').style.background = '#22c55e';
+        } else {
+          $id('studio-status-dot').style.background = '#ef4444';
+        }
         $id('scan-btn').disabled = !studioConnected;
         $id('run-spoofer-btn').disabled = !studioConnected;
         $id('send-replace-btn').disabled = !studioConnected;
       });
 
       window.electronAPI?.onStudioScanResult(data => {
-        $id('scan-status-badge').classList.add('hidden');
-        if (!data.results?.length) {
-          updateStatus(`No ${data.assetType}s found`);
+        if (data.status === 'scanning') {
+          if (data.isStart) {
+            $id('animationId').value = '';
+            $id('scan-progress-card').classList.remove('hidden');
+            $id('scan-status-badge').classList.remove('hidden');
+            $id('scan-status-badge').textContent = 'Scanning...';
+          }
+          const pct = data.progress || 0;
+          $id('scan-progress-bar').style.width = pct + '%';
+          $id('scan-progress-pct').textContent = pct + '%';
+          const count = data.results?.length || 0;
+          $id('scan-progress-found').textContent =
+            `Found ${count} animation${count !== 1 ? 's' : ''} so far...`;
+          if (count > 0) $id('animationId').value = data.results.join('\n');
           return;
         }
-        const current = $id('animationId').value;
-        const existing = new Set(
-          current
-            .split('\n')
-            .map(l => l.match(/^(\d+)/)?.[1])
-            .filter(Boolean)
-        );
-        const fresh = data.results.filter(l => {
-          const m = l.match(/^(\d+)/);
-          return m && !existing.has(m[1]);
-        });
-        if (fresh.length) {
-          $id('animationId').value = (current ? current + '\n' : '') + fresh.join('\n');
-          updateStatus(
-            `Scanned ${fresh.length} ${data.assetType}s (${data.results.length - fresh.length} skipped)`
-          );
-        } else {
-          updateStatus(`All ${data.assetType}s already in list`);
+        $id('scan-status-badge').classList.add('hidden');
+        $id('scan-progress-card').classList.add('hidden');
+        if (!data.results?.length) {
+          updateStatus('No animations found');
+          return;
         }
+        $id('animationId').value = data.results.join('\n');
+        updateStatus(
+          `Scan complete — ${data.results.length} animation${data.results.length !== 1 ? 's' : ''} found`
+        );
       });
 
       window.electronAPI?.onStudioReplaceComplete(data => {
+        $id('send-replace-btn').disabled = false;
         updateStatus(
           data?.success
-            ? `Replaced ${data.replacedCount || 0} instances in Studio`
+            ? `Replaced ${data.replacedCount || 0} instances in Studio (${(data.elapsed || 0).toFixed(1)}s)`
             : 'Replace failed in Studio'
         );
+      });
+
+      async function refreshRunsDropdown() {
+        const sel = $id('history-runs-dropdown');
+        if (!sel) return;
+        const loadBtn = $id('load-session-btn');
+        const delBtn = $id('delete-session-btn');
+        const runs = (await window.electronAPI?.getRunsHistory()) || [];
+        if (!runs.length) {
+          sel.innerHTML = '<option value="">— no saved sessions —</option>';
+          loadBtn.disabled = true;
+          delBtn.disabled = true;
+          return;
+        }
+        const prev = sel.value;
+        sel.innerHTML =
+          '<option value="">— select a session —</option>' +
+          runs
+            .map(r => {
+              const d = new Date(r.startedAt);
+              const dt = d.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+              const count = r.transfers?.length || 0;
+              const icon = r.status === 'complete' ? '✓' : r.status === 'failed' ? '✗' : '◌';
+              return `<option value="${esc(r.id)}">${icon} ${dt} — ${count} asset${count !== 1 ? 's' : ''} · ${esc(r.status || 'active')}</option>`;
+            })
+            .join('');
+        if (prev && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
+        const hasVal = !!sel.value;
+        loadBtn.disabled = !hasVal;
+        delBtn.disabled = !hasVal;
+      }
+
+      $id('history-runs-dropdown').addEventListener('change', () => {
+        const hasVal = !!$id('history-runs-dropdown').value;
+        $id('load-session-btn').disabled = !hasVal;
+        $id('delete-session-btn').disabled = !hasVal;
+      });
+
+      $id('refresh-sessions-btn').addEventListener('click', refreshRunsDropdown);
+
+      $id('load-session-btn').addEventListener('click', async () => {
+        const id = $id('history-runs-dropdown').value;
+        if (!id) return;
+        const runs = (await window.electronAPI?.getRunsHistory()) || [];
+        const run = runs.find(r => r.id === id);
+        if (!run) return;
+        resetQueue();
+        (run.transfers || []).forEach(t => upsertQueueItem(t));
+        if (run.summary) renderRunReport(run.summary);
+        if (run.output) $id('output-data').value = run.output;
+        updateStatus(
+          `Session loaded — ${run.transfers?.length || 0} transfer${(run.transfers?.length || 0) !== 1 ? 's' : ''}`
+        );
+      });
+
+      $id('delete-session-btn').addEventListener('click', async () => {
+        const id = $id('history-runs-dropdown').value;
+        if (!id) return;
+        await window.electronAPI?.deleteRun(id);
+        await refreshRunsDropdown();
+        updateStatus('Session deleted');
       });
 
       async function updatePluginButton(hasPluginUpdate) {
@@ -1434,16 +1579,6 @@
         if (ok) window.electronAPI?.openExternal(res.releaseUrl);
       });
 
-      window.electronAPI?.onUpdateAvailable(({ latest, releaseUrl }) => {
-        const btn = $id('update-btn');
-        btn.innerHTML = '<i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Update';
-        btn.classList.remove('text-gray-500');
-        btn.classList.add('text-brand');
-        lucide.createIcons();
-        updateStatus(`Update available: ${latest}`);
-        $id('update-plugin-btn').classList.remove('hidden');
-      });
-
       window.electronAPI?.getAppVersion().then(v => {
         $id('version-text').textContent = 'v' + v;
       });
@@ -1454,6 +1589,7 @@
         await refreshAccountInfo();
         await refreshGroupDropdown();
         await updatePluginButton();
+        await refreshRunsDropdown();
         updateStatus('Ready');
         const upd = await window.electronAPI?.checkForUpdates();
         if (upd && !upd.error && !upd.upToDate) {

@@ -322,12 +322,16 @@ async function downloadAsset(
     try {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-      const resp = await fetch(url, {
-        headers: { Cookie: cookieHeader },
-        redirect: 'follow',
-        signal: ctrl.signal,
-      });
-      clearTimeout(timer);
+      let resp;
+      try {
+        resp = await fetch(url, {
+          headers: { Cookie: cookieHeader },
+          redirect: 'follow',
+          signal: ctrl.signal,
+        });
+      } finally {
+        clearTimeout(timer);
+      }
 
       if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
       if (!resp.body) throw new Error(`No response body (ID: ${assetId})`);
@@ -513,6 +517,7 @@ async function uploadAsset(
 
 const sessionPath = () => path.join(app.getPath('userData'), 'jonuffy_state.json');
 const historyPath = () => path.join(app.getPath('userData'), 'jonuffy_mappings.json');
+const runsPath = () => path.join(app.getPath('userData'), 'jonuffy_runs.json');
 
 const saveSession = s => fs.writeFile(sessionPath(), JSON.stringify(s)).catch(() => {});
 const loadSession = async () => {
@@ -535,6 +540,17 @@ async function loadHistory() {
 const saveHistory = h =>
   fs.writeFile(historyPath(), JSON.stringify(h || {}, null, 2)).catch(() => {});
 const clearHistory = () => fs.unlink(historyPath()).catch(() => {});
+
+async function loadRuns() {
+  try {
+    const list = JSON.parse(await fs.readFile(runsPath(), 'utf8'));
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+const saveRuns = list =>
+  fs.writeFile(runsPath(), JSON.stringify(list || [], null, 2)).catch(() => {});
 
 const hKey = (type, target, id) => `${type}:${target}:${id}`;
 async function rememberMapping(type, target, origId, newId, name) {
@@ -575,6 +591,8 @@ module.exports = {
   clearSession,
   loadHistory,
   clearHistory,
+  loadRuns,
+  saveRuns,
   hKey,
   rememberMapping,
 };

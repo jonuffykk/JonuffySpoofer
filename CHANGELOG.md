@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.5.0
+
+- Core code optimization across all modules — reduced memory footprint and faster execution paths
+- Mapping system overhaul — output generation is now deterministic and deduplicated end-to-end
+- Response time reduced by coalescing redundant IPC calls and deferring non-critical UI updates
+- Fixed Lua syntax error (`+=` replaced with `= +`) in the Studio plugin preventing script runtime failure
+- Fixed timer leak in `downloadAsset` — abort timer now always clears in a `finally` block
+- Fixed duplicate error propagation in `runSpoofer` — removed extra `throw err` after `fail()` to prevent double renderer notifications
+- Removed dead code (`listFails` function, unused `onUpdateAvailable` listener and preload export) across main and renderer processes
+- Added defensive `try/catch` around group permission checks in the UI to prevent unhandled promise rejections
+- Run history is now persisted as complete sessions — each run is stored with full transfer state, output, and summary for later inspection
+- Session restoration loads the full queue state and report cards instead of just the mapping list
+- Studio plugin now displays real-time connection status in a dedicated dock widget with themed UI colors
+- Plugin auto-reconnects on app launch with exponential back-off and visual feedback on connection loss
+- Connection stability improved — server now resets state atomically on reconnect and handles concurrent scan/replace requests safely
+- Studio banner updates instantly on connect/disconnect with accurate place name and status dot color
+- Scan progress now streams percentage and found count back to the app in real time via the local HTTP bridge
+- Batch asset delivery fallback refined — chunk size adapts dynamically on failure, and single-asset retry uses all available place IDs
+- Download concurrency auto-throttles when batch errors are detected to minimize further rate-limit hits
+- All network timeouts, retry delays, and cooldown periods are now configurable through the Settings panel
+
 ## v1.4.7
 
 - Removed Sound/audio spoofing mode — animation-only
@@ -39,17 +60,11 @@
 ## v1.0.2
 
 - Fixed plugin installation not working
-
-## v1.0.1
-
 - Fixed job dependencies in release workflow
 - Fixed Discord webhook JSON for notifications
 - Updated Node.js to 24 in workflow
 - Adjusted artifactName to generate files correctly
 - Optimized build process for faster execution
-
-## v1.0.0
-
 - Electron app with Tailwind CSS UI
 - Built-in update checker via GitHub releases API
 - Deep uninstall from the sidebar
