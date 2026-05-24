@@ -1,109 +1,108 @@
-local httpService = game:GetService("HttpService")
+local http = game:GetService("HttpService")
 local marketplace = game:GetService("MarketplaceService")
 
-local SERVER_URL = "http://127.0.0.1:28476"
-local isConnected = false
-local lastMappingsHash = nil
+local URL = "http://127.0.0.1:28476"
+local POLL_INTERVAL = 2
+local connected = false
+local totalReplaced = 0
+local placeName = "Unknown"
+local lastMappingHash = ""
+local scanning = false
 
-local widgetInfo = DockWidgetPluginGuiInfo.new(
-	Enum.InitialDockState.Right,
-	true,
-	false,
-	240,
-	160,
-	200,
-	120
-)
+local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Right, false, false, 240, 180, 200, 140)
+local widget = plugin:CreateDockWidgetPluginGui("JonuffySpoofer", widgetInfo)
+widget.Title = "Jonuffy Spoofer"
 
-local spooferWidget = plugin:CreateDockWidgetPluginGui("SpooferConnectionStatus", widgetInfo)
-spooferWidget.Title = "Spoofer Status"
-
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(1, 0, 1, 0)
-mainFrame.BorderSizePixel = 0
-mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-mainFrame.Parent = spooferWidget
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.BorderSizePixel = 0
+frame.Parent = widget
 
 local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 10)
+layout.Padding = UDim.new(0, 8)
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.Parent = mainFrame
+layout.Parent = frame
 
-local statusText = Instance.new("TextLabel")
-statusText.Size = UDim2.new(0.9, 0, 0, 24)
-statusText.BackgroundTransparency = 1
-statusText.TextColor3 = Color3.fromRGB(220, 220, 220)
-statusText.TextSize = 14
-statusText.Font = Enum.Font.SourceSansBold
-statusText.TextXAlignment = Enum.TextXAlignment.Center
-statusText.Parent = mainFrame
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(0.9, 0, 0, 22)
+statusLabel.BackgroundTransparency = 1
+statusLabel.TextSize = 14
+statusLabel.Font = Enum.Font.SourceSansBold
+statusLabel.TextXAlignment = Enum.TextXAlignment.Center
+statusLabel.Parent = frame
 
-local detailsText = Instance.new("TextLabel")
-detailsText.Size = UDim2.new(0.9, 0, 0, 40)
-detailsText.BackgroundTransparency = 1
-detailsText.TextColor3 = Color3.fromRGB(160, 160, 160)
-detailsText.TextSize = 12
-detailsText.TextWrapped = true
-detailsText.Font = Enum.Font.SourceSans
-detailsText.TextXAlignment = Enum.TextXAlignment.Center
-detailsText.Parent = mainFrame
+local detailLabel = Instance.new("TextLabel")
+detailLabel.Size = UDim2.new(0.9, 0, 0, 36)
+detailLabel.BackgroundTransparency = 1
+detailLabel.TextSize = 12
+detailLabel.TextWrapped = true
+detailLabel.Font = Enum.Font.SourceSans
+detailLabel.TextXAlignment = Enum.TextXAlignment.Center
+detailLabel.Parent = frame
 
-local reconnectButton = Instance.new("TextButton")
-reconnectButton.Size = UDim2.new(0.8, 0, 0, 30)
-reconnectButton.BackgroundColor3 = Color3.fromRGB(0, 162, 255)
-reconnectButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-reconnectButton.TextSize = 14
-reconnectButton.Font = Enum.Font.SourceSansBold
-reconnectButton.Text = "Reconnect"
-local btnCorner = Instance.new("UICorner")
-btnCorner.CornerRadius = UDim.new(0, 6)
-btnCorner.Parent = reconnectButton
-reconnectButton.Parent = mainFrame
+local extraLabel = Instance.new("TextLabel")
+extraLabel.Size = UDim2.new(0.9, 0, 0, 28)
+extraLabel.BackgroundTransparency = 1
+extraLabel.TextSize = 11
+extraLabel.TextWrapped = true
+extraLabel.Font = Enum.Font.SourceSans
+extraLabel.TextXAlignment = Enum.TextXAlignment.Center
+extraLabel.Text = ""
+extraLabel.Parent = frame
+
+local connectBtn = Instance.new("TextButton")
+connectBtn.Size = UDim2.new(0.8, 0, 0, 28)
+connectBtn.TextSize = 13
+connectBtn.Font = Enum.Font.SourceSansBold
+connectBtn.Text = "Connect"
+Instance.new("UICorner").Parent = connectBtn
+connectBtn.Parent = frame
 
 local function applyTheme()
-	local theme = settings().Studio.Theme
-	mainFrame.BackgroundColor3 = theme:GetColor(Enum.StudioStyleGuideColor.MainBackground)
-	statusText.TextColor3 = theme:GetColor(Enum.StudioStyleGuideColor.MainText)
-	detailsText.TextColor3 = theme:GetColor(Enum.StudioStyleGuideColor.DimmedText)
-	reconnectButton.BackgroundColor3 = theme:GetColor(Enum.StudioStyleGuideColor.Button)
-	reconnectButton.TextColor3 = theme:GetColor(Enum.StudioStyleGuideColor.ButtonText)
+	local t = settings().Studio.Theme
+	frame.BackgroundColor3 = t:GetColor(Enum.StudioStyleGuideColor.MainBackground)
+	statusLabel.TextColor3 = t:GetColor(Enum.StudioStyleGuideColor.MainText)
+	detailLabel.TextColor3 = t:GetColor(Enum.StudioStyleGuideColor.DimmedText)
+	extraLabel.TextColor3 = t:GetColor(Enum.StudioStyleGuideColor.DimmedText)
+	connectBtn.BackgroundColor3 = t:GetColor(Enum.StudioStyleGuideColor.Button)
+	connectBtn.TextColor3 = t:GetColor(Enum.StudioStyleGuideColor.ButtonText)
 end
 pcall(applyTheme)
-pcall(function()
-	settings().Studio.ThemeChanged:Connect(applyTheme)
-end)
+pcall(function() settings().Studio.ThemeChanged:Connect(applyTheme) end)
 
 local function updateUI()
-	if isConnected then
-		statusText.Text = "Status: Connected"
-		statusText.TextColor3 = Color3.fromRGB(50, 205, 50)
-		local placeId = game.PlaceId or 0
-		detailsText.Text = string.format("Connected to Place %d\n", placeId)
-		reconnectButton.Visible = false
+	if connected then
+		statusLabel.Text = "Connected"
+		statusLabel.TextColor3 = Color3.fromRGB(50, 205, 50)
+		detailLabel.Text = placeName .. "  (" .. tostring(game.PlaceId or 0) .. ")"
+		extraLabel.Text = scanning and "Scanning..."
+			or totalReplaced > 0 and (totalReplaced .. " ID" .. (totalReplaced == 1 and "" or "s") .. " replaced")
+			or "Waiting for spoofer..."
+		connectBtn.Visible = false
 	else
-		statusText.Text = "Status: Disconnected"
-		statusText.TextColor3 = Color3.fromRGB(220, 50, 50)
-		detailsText.Text = "Not connected to the Spoofer app. Ensure the desktop app is running."
-		reconnectButton.Visible = true
-		reconnectButton.Text = "Connect"
+		statusLabel.Text = "Disconnected"
+		statusLabel.TextColor3 = Color3.fromRGB(220, 50, 50)
+		detailLabel.Text = "Open the Jonuffy Spoofer app"
+		extraLabel.Text = "then click Connect below"
+		connectBtn.Visible = true
 	end
 end
 
-local function request(endpoint, method, data)
+local function req(endpoint, method, data)
 	local ok, res = pcall(function()
-		return httpService:RequestAsync({
-			Url = SERVER_URL .. endpoint,
+		return http:RequestAsync({
+			Url = URL .. endpoint,
 			Method = method,
 			Headers = { ["Content-Type"] = "application/json" },
-			Body = (method ~= "GET" and data) and httpService:JSONEncode(data) or nil,
+			Body = (method ~= "GET" and data) and http:JSONEncode(data) or nil,
 		})
 	end)
 	if not ok then return false, nil end
-	local status = res.StatusCode or 0
-	if status < 200 or status >= 300 then return false, nil end
-	local dok, decoded = pcall(function() return httpService:JSONDecode(res.Body) end)
-	return true, dok and decoded or res.Body
+	local s = res.StatusCode or 0
+	if s < 200 or s >= 300 then return false, nil end
+	local dok, decoded = pcall(function() return http:JSONDecode(res.Body) end)
+	return true, dok and decoded or nil
 end
 
 local function getCreatorInfo(info)
@@ -112,67 +111,76 @@ local function getCreatorInfo(info)
 	return cType, cId
 end
 
-local function getAnimationIds()
-	local results, seen = {}, {}
-	local descendants = game:GetDescendants()
-	local total = #descendants
-	request("/scan", "POST", { status = "scanning", progress = 0, results = {}, isStart = true })
+local function scanAnimations()
+	if scanning then return end
+	scanning = true
+	updateUI()
 
+	local results, seen = {}, {}
+	local pending = {}
+	local pendingCount = 0
+	local function flush(force)
+		if pendingCount == 0 then return end
+		if not force and pendingCount < 10 then return end
+		for _, r in ipairs(pending) do table.insert(results, r) end
+		pending = {}
+		pendingCount = 0
+		req("/scan-result", "POST", { status = "scanning", results = results })
+	end
+
+	local descendants = game:GetDescendants()
 	for i, obj in ipairs(descendants) do
-		if i % 100 == 0 then
-			task.wait()
-			local progress = math.floor((i / total) * 100)
-			request("/scan", "POST", { status = "scanning", progress = progress, results = results })
-		end
+		if i % 150 == 0 then task.wait() end
+
 		if obj:IsA("Animation") then
 			local id = obj.AnimationId:match("rbxassetid://(%d+)")
 			if id and not seen[id] then
 				local ok, info = pcall(function() return marketplace:GetProductInfo(tonumber(id)) end)
 				if ok and info and info.AssetTypeId == 24 then
 					local cType, cId = getCreatorInfo(info)
-					table.insert(results, string.format("%s - %s - %s: %s", id, info.Name or "Unknown", cType, cId))
+					table.insert(pending, string.format("%s - %s - %s: %s", id, info.Name or "Unknown", cType, cId))
 					seen[id] = true
-					local progress = math.floor((i / total) * 100)
-					request("/scan", "POST", { status = "scanning", progress = progress, results = results })
+					pendingCount += 1
+					flush(false)
 				end
 			end
 		elseif obj:IsA("LuaSourceContainer") then
 			local sok, src = pcall(function() return obj.Source end)
 			if sok and src and src ~= "" then
-				for matchedId in src:gmatch("rbxassetid://(%d+)") do
-					if not seen[matchedId] then
-						local ok2, info2 = pcall(function() return marketplace:GetProductInfo(tonumber(matchedId)) end)
+				for matchId in src:gmatch("rbxassetid://(%d+)") do
+					if not seen[matchId] then
+						local ok2, info2 = pcall(function() return marketplace:GetProductInfo(tonumber(matchId)) end)
 						if ok2 and info2 and info2.AssetTypeId == 24 then
 							local cType, cId = getCreatorInfo(info2)
-							table.insert(results, string.format("%s - %s - %s: %s", matchedId, info2.Name or "Unknown", cType, cId))
-							seen[matchedId] = true
-							local progress = math.floor((i / total) * 100)
-							request("/scan", "POST", { status = "scanning", progress = progress, results = results })
+							table.insert(pending, string.format("%s - %s - %s: %s", matchId, info2.Name or "Unknown", cType, cId))
+							seen[matchId] = true
+							pendingCount += 1
+							flush(false)
 						end
 					end
 				end
 			end
 		end
 	end
-	request("/scan", "POST", { status = "completed", progress = 100, results = results })
-	return results
+
+	flush(true)
+	req("/scan-result", "POST", { status = "completed", results = results })
+	scanning = false
+	updateUI()
 end
 
-local function buildIdMap(mappings)
+local function replaceIds(mappings)
 	local idMap = {}
-	for line in mappings:gmatch("[^\r\n]+") do
-		local oldId, newId = line:match("(%d+)%s*[=|]%s*(%d+)")
+	for _, line in ipairs(mappings) do
+		local oldId, newId = line:match("(%d+)%s*=%s*(%d+)")
 		if oldId and newId and oldId ~= newId then
 			idMap[oldId] = newId
 		end
 	end
-	return idMap
-end
+	if not next(idMap) then return end
 
-local function replaceIds(idMap)
 	local count = 0
-	local startTime = tick()
-
+	local t0 = tick()
 	for _, obj in ipairs(game:GetDescendants()) do
 		if obj:IsA("Animation") then
 			local id = obj.AnimationId:match("rbxassetid://(%d+)")
@@ -187,135 +195,65 @@ local function replaceIds(idMap)
 				for oldId, newId in pairs(idMap) do
 					newSrc = newSrc:gsub("rbxassetid://" .. oldId, "rbxassetid://" .. newId)
 				end
-				if newSrc ~= src then
-					obj.Source = newSrc
-					count = count + 1
-				end
+				if newSrc ~= src then obj.Source = newSrc; count = count + 1 end
 			end
 		end
 	end
 
-	local elapsed = tick() - startTime
-	request("/replace-complete", "POST", { success = true, replacedCount = count, elapsed = elapsed })
-	return count
+	totalReplaced = totalReplaced + count
+	req("/replace-complete", "POST", { success = true, replacedCount = count, elapsed = tick() - t0 })
+	updateUI()
 end
 
-local function connect()
-	local ok = select(1, request("/ping", "GET"))
-	if not ok then
-		isConnected = false
-		return false
-	end
-
+local function doConnect()
 	local placeId = game.PlaceId or 0
-	local placeName = "Unknown"
-	local nameOk, info = pcall(function()
-		return placeId > 0 and marketplace:GetProductInfo(placeId).Name or nil
-	end)
-	if nameOk and info then placeName = info end
-
-	local cok = select(1, request("/connect", "POST", { placeId = placeId, placeName = placeName }))
-	if cok then
-		isConnected = true
-		lastMappingsHash = nil
-	else
-		isConnected = false
-	end
-	return isConnected
+	local nameOk, info = pcall(function() return placeId > 0 and marketplace:GetProductInfo(placeId).Name or nil end)
+	placeName = (nameOk and info) and info or ("Place " .. tostring(placeId))
+	local ok = select(1, req("/connect", "POST", { placeId = placeId, placeName = placeName }))
+	connected = ok
+	return ok
 end
 
 local function poll()
-	while isConnected do
-		task.wait(2)
-		local hasActivity = false
-
-		local pok, _ = request("/ping", "GET")
-		if not pok then
-			isConnected = false
+	while connected do
+		task.wait(POLL_INTERVAL)
+		local ok, body = req("/poll", "GET")
+		if not ok then
+			connected = false
 			updateUI()
 			break
 		end
 
-		local sok, scanRes = request("/get-scan-request", "GET")
-		if not sok then
-			isConnected = false
-			updateUI()
-			break
-		end
-		if scanRes and scanRes.assetType == "Animation" then
-			local results = getAnimationIds()
-			if results and #results > 0 then
-				local postOk = request("/scan", "POST", { assetType = "Animation", results = results, timestamp = os.time() })
-				if not postOk then
-					isConnected = false
-					updateUI()
-					break
-				end
-				hasActivity = true
+		if body then
+			if body.scanRequest and body.scanRequest.assetType == "Animation" then
+				task.spawn(scanAnimations)
 			end
-		end
 
-		local mok, mapRes = request("/get-mappings", "GET")
-		if not mok then
-			isConnected = false
-			updateUI()
-			break
-		end
-		if mapRes and mapRes.mappings and #mapRes.mappings > 0 then
-			local hash = table.concat(mapRes.mappings, "|")
-			if hash ~= lastMappingsHash then
-				lastMappingsHash = hash
-				local idMap = buildIdMap(table.concat(mapRes.mappings, "\n"))
-				if next(idMap) then
-					local count = replaceIds(idMap)
-					if count > 0 then
-						local postOk = request("/replace-complete", "POST", { success = true, replacedCount = count })
-						if not postOk then
-							isConnected = false
-							updateUI()
-							break
-						end
-						hasActivity = true
-					end
+			if body.mappings and #body.mappings > 0 then
+				local hash = table.concat(body.mappings, "|")
+				if hash ~= lastMappingHash then
+					lastMappingHash = hash
+					task.spawn(function() replaceIds(body.mappings) end)
 				end
 			end
 		end
-
-		if not hasActivity then task.wait(8) end
 	end
 end
 
-reconnectButton.MouseButton1Click:Connect(function()
-	detailsText.Text = "Connecting..."
-	isConnected = false
+connectBtn.MouseButton1Click:Connect(function()
+	detailLabel.Text = "Connecting..."
+	connected = false
 	updateUI()
-	local ok = connect()
-	updateUI()
-	if ok then
+	if doConnect() then
+		updateUI()
 		task.spawn(poll)
 	else
-		detailsText.Text = "Connection failed. Make sure the spoofer desktop app is open."
+		detailLabel.Text = "Failed — is the desktop app running?"
 	end
 end)
 
 local toolbar = plugin:CreateToolbar("Jonuffy Spoofer")
-local toggleButton = toolbar:CreateButton("Jonuffy Spoofer", "View Details", "rbxassetid://133573191144566")
-toggleButton.Click:Connect(function()
-	spooferWidget.Enabled = not spooferWidget.Enabled
-end)
-
-task.spawn(function()
-	while true do
-		if not isConnected then
-			if connect() then
-				updateUI()
-				task.spawn(poll)
-			else
-				updateUI()
-			end
-		end
-		task.wait(5)
-	end
-end)
+local toolBtn = toolbar:CreateButton("Jonuffy Spoofer", "Toggle widget", "rbxassetid://133573191144566")
+toolBtn.Click:Connect(function() widget.Enabled = not widget.Enabled end)
 
 updateUI()

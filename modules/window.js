@@ -12,21 +12,20 @@ const iconPath =
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 880,
-    height: 680,
+    width: 800,
+    height: 500,
     title: 'Jonuffy Spoofer',
     icon: iconPath,
     frame: false,
     resizable: false,
     show: false,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#0a0a0a',
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
-
   mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
   mainWindow.once('ready-to-show', () => mainWindow.show());
   mainWindow.on('closed', () => {
@@ -45,7 +44,6 @@ function setupAppLifecycle() {
       if (!BrowserWindow.getAllWindows().length) createWindow();
     });
   });
-
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
   });

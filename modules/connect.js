@@ -1,149 +1,120 @@
 'use strict';
 
 const http = require('http');
-const { URL } = require('url');
 
+const PORT = 28476;
 let server = null;
-let studioConnection = null;
-let callbacks = {
-  onScanResult: null,
-  onReplaceComplete: null,
-  onStatusUpdate: null,
-  onScanRequest: null,
+let studioConn = null;
+let callbacks = {};
+let pendingMappings = null;
+let pendingScanReq = null;
+let scanHandler = null;
+
+const setStudioCallbacks = cb => {
+  callbacks = cb;
+};
+const getConn = () => studioConn;
+const setMappings = m => {
+  pendingMappings = m;
 };
 
-function parseBody(req) {
-  return new Promise((resolve, reject) => {
-    let body = '';
-    req.on('data', chunk => (body += chunk));
+const parseBody = req =>
+  new Promise((res, rej) => {
+    let buf = '';
+    req.on('data', c => {
+      buf += c;
+    });
     req.on('end', () => {
       try {
-        resolve(JSON.parse(body));
+        res(JSON.parse(buf || '{}'));
       } catch {
-        reject(new Error('Invalid JSON'));
+        res({});
       }
     });
+    req.on('error', rej);
   });
-}
 
-function send(res, status, data) {
-  res.writeHead(status, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify(data));
-}
+const reply = (res, status, body) => {
+  const data = JSON.stringify(body);
+  res.writeHead(status, {
+    'Content-Type': 'application/json',
+    'Content-Length': Buffer.byteLength(data),
+  });
+  res.end(data);
+};
 
-function startServer(port = 28476) {
-  if (server) {
-    server.close();
-    studioConnection = null;
+async function handleRequest(req, res) {
+  const url = req.url;
+
+  if (url === '/connect' && req.method === 'POST') {
+    const body = await parseBody(req);
+    studioConn = {
+      connected: true,
+      placeId: body.placeId,
+      placeName: body.placeName,
+      connectedAt: Date.now(),
+    };
+    callbacks.onStatusUpdate?.('connected', studioConn);
+    return reply(res, 200, { ok: true });
   }
 
-  server = http.createServer(async (req, res) => {
-    const { pathname } = new URL(req.url, `http://${req.headers.host}`);
+  if (url === '/disconnect' && req.method === 'POST') {
+    studioConn = null;
+    callbacks.onStatusUpdate?.('disconnected', null);
+    return reply(res, 200, { ok: true });
+  }
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') return send(res, 204, {});
-
-    try {
-      if (pathname === '/ping' && req.method === 'GET') {
-        return send(res, 200, { status: 'ok', timestamp: Date.now() });
-      }
-
-      if (pathname === '/connect' && req.method === 'POST') {
-        studioConnection = null;
-        global.currentMappings = [];
-        const data = await parseBody(req);
-        studioConnection = {
-          connected: true,
-          placeId: data.placeId ?? null,
-          placeName: data.placeName ?? null,
-          connectedAt: new Date().toISOString(),
-        };
-        callbacks.onStatusUpdate?.('connected', studioConnection);
-        return send(res, 200, { success: true });
-      }
-
-      if (!studioConnection) {
-        return send(res, 401, { error: 'Unauthorized' });
-      }
-
-      if (pathname === '/disconnect' && req.method === 'POST') {
-        studioConnection = null;
-        callbacks.onStatusUpdate?.('disconnected', null);
-        return send(res, 200, { success: true });
-      }
-
-      if (pathname === '/scan' && req.method === 'POST') {
-        const data = await parseBody(req);
-        callbacks.onScanResult?.(data);
-        return send(res, 200, { success: true });
-      }
-
-      if (pathname === '/get-mappings' && req.method === 'GET') {
-        return send(res, 200, { mappings: global.currentMappings ?? [] });
-      }
-
-      if (pathname === '/set-mappings' && req.method === 'POST') {
-        const data = await parseBody(req);
-        global.currentMappings = data.mappings ?? [];
-        return send(res, 200, { success: true });
-      }
-
-      if (pathname === '/request-scan' && req.method === 'POST') {
-        const data = await parseBody(req);
-        callbacks.onScanRequest?.(data);
-        return send(res, 200, { success: true });
-      }
-
-      if (pathname === '/get-scan-request' && req.method === 'GET') {
-        const pending = global.pendingScanRequest ?? null;
-        global.pendingScanRequest = null;
-        return send(res, 200, { assetType: pending?.assetType ?? null });
-      }
-
-      if (pathname === '/replace-complete' && req.method === 'POST') {
-        const data = await parseBody(req);
-        callbacks.onReplaceComplete?.(data);
-        return send(res, 200, { success: true });
-      }
-
-      send(res, 404, { error: 'Not found' });
-    } catch {
-      send(res, 400, { error: 'Invalid JSON' });
+  if (url === '/poll' && req.method === 'GET') {
+    const resp = {};
+    if (pendingScanReq) {
+      resp.scanRequest = pendingScanReq;
+      pendingScanReq = null;
     }
+    if (pendingMappings) {
+      resp.mappings = pendingMappings;
+      pendingMappings = null;
+    }
+    return reply(res, 200, resp);
+  }
+
+  if (url === '/scan-result' && req.method === 'POST') {
+    const body = await parseBody(req);
+    callbacks.onScanResult?.(body);
+    scanHandler?.(body);
+    return reply(res, 200, { ok: true });
+  }
+
+  if (url === '/replace-complete' && req.method === 'POST') {
+    const body = await parseBody(req);
+    callbacks.onReplaceComplete?.(body);
+    return reply(res, 200, { ok: true });
+  }
+
+  if (url === '/request-scan' && req.method === 'POST') {
+    const body = await parseBody(req);
+    pendingScanReq = body;
+    return reply(res, 200, { ok: true });
+  }
+
+  if (url === '/set-mappings' && req.method === 'POST') {
+    const body = await parseBody(req);
+    pendingMappings = body.mappings;
+    return reply(res, 200, { ok: true });
+  }
+
+  reply(res, 404, { error: 'Not found' });
+}
+
+function startServer() {
+  server = http.createServer((req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    handleRequest(req, res).catch(() => reply(res, 500, { error: 'Internal error' }));
   });
-
-  server.listen(port, '127.0.0.1').on('error', err => {
-    console.error(
-      `Server error: ${err.code === 'EADDRINUSE' ? `Port ${port} already in use` : err.message}`
-    );
-  });
-
-  return server;
+  server.listen(PORT, '127.0.0.1');
 }
 
-function stopServer() {
-  server?.close();
-  server = null;
-  studioConnection = null;
-}
-
-function getStudioConnection() {
-  return studioConnection;
-}
-function setStudioCallbacks(cbs) {
-  callbacks = { ...callbacks, ...cbs };
-}
-function setMappings(mappings) {
-  global.currentMappings = mappings;
-}
-
-module.exports = {
-  startServer,
-  stopServer,
-  getStudioConnection,
-  setStudioCallbacks,
-  setMappings,
+const setScanHandler = fn => {
+  scanHandler = fn;
 };
+
+module.exports = { startServer, getConn, setMappings, setStudioCallbacks, setScanHandler };

@@ -2,20 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Jonuffy Spoofer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
               brand: '#3b5bdb',
-              brandHover: '#2f4ab8',
+              brandH: '#364fc7',
               brandDim: '#eef2ff',
               danger: '#e03131',
-              success: '#2f9e44',
-              warn: '#f08c00',
+              ok: '#2f9e44',
+              warn: '#e67700',
             },
             fontFamily: {
               sans: ['DM Sans', 'system-ui', 'sans-serif'],
@@ -33,22 +33,18 @@
     <style>
       * {
         scrollbar-width: thin;
-        scrollbar-color: #dee2e6 transparent;
+        scrollbar-color: #e5e7eb transparent;
       }
 
       *::-webkit-scrollbar {
         width: 3px;
       }
 
-      *::-webkit-scrollbar-track {
-        background: transparent;
-      }
-
       *::-webkit-scrollbar-thumb {
-        background: #dee2e6;
+        background: #e5e7eb;
       }
 
-      .titlebar-drag {
+      .drag {
         -webkit-app-region: drag;
       }
 
@@ -56,16 +52,12 @@
         -webkit-app-region: no-drag;
       }
 
-      .tab-content {
+      .page {
         display: none;
       }
 
-      .tab-content.active {
+      .page.on {
         display: block;
-      }
-
-      input[type='range'] {
-        accent-color: #3b5bdb;
       }
 
       .field:focus {
@@ -73,10 +65,14 @@
         border-color: #3b5bdb;
       }
 
-      @keyframes fadeIn {
+      input[type='range'] {
+        accent-color: #3b5bdb;
+      }
+
+      @keyframes fade {
         from {
           opacity: 0;
-          transform: translateY(4px);
+          transform: translateY(2px);
         }
 
         to {
@@ -85,33 +81,268 @@
         }
       }
 
-      .page-enter {
-        animation: fadeIn 0.18s ease-out forwards;
+      .page.on {
+        animation: fade 0.12s ease;
+      }
+
+      html.dark,
+      html.dark body {
+        background: #0c0c10 !important;
+        color: #e8e8ec !important;
+      }
+      html.dark * {
+        scrollbar-color: #2a2a30 transparent;
+      }
+      html.dark *::-webkit-scrollbar-thumb {
+        background: #2a2a30;
+      }
+      html.dark .bg-white {
+        background-color: #15151a !important;
+      }
+      html.dark .bg-gray-50 {
+        background-color: #111116 !important;
+      }
+      html.dark .bg-gray-100 {
+        background-color: #1e1e24 !important;
+      }
+      html.dark .bg-gray-950 {
+        background-color: #0a0a0e !important;
+      }
+      html.dark .text-gray-900 {
+        color: #e8e8ec !important;
+      }
+      html.dark .text-gray-800 {
+        color: #d4d4dc !important;
+      }
+      html.dark .text-gray-700 {
+        color: #b8b8c0 !important;
+      }
+      html.dark .text-gray-600 {
+        color: #9c9ca6 !important;
+      }
+      html.dark .text-gray-500 {
+        color: #85858e !important;
+      }
+      html.dark .text-gray-400 {
+        color: #6e6e78 !important;
+      }
+      html.dark .text-gray-300 {
+        color: #6e6e78 !important;
+      }
+      html.dark .border-gray-200 {
+        border-color: #25252c !important;
+      }
+      html.dark .border-gray-100 {
+        border-color: #1e1e24 !important;
+      }
+      html.dark .border-gray-800 {
+        border-color: #1e1e24 !important;
+      }
+      html.dark .hover\:bg-gray-50:hover {
+        background-color: #1a1a20 !important;
+      }
+      html.dark .hover\:bg-gray-100:hover {
+        background-color: #2a2a30 !important;
+      }
+      html.dark .hover\:bg-gray-200:hover {
+        background-color: #33333a !important;
+      }
+      html.dark .hover\:text-gray-700:hover {
+        color: #d4d4dc !important;
+      }
+      html.dark .hover\:text-gray-600:hover {
+        color: #b8b8c0 !important;
+      }
+      html.dark .field {
+        background-color: #111116 !important;
+        border-color: #25252c !important;
+        color: #e8e8ec !important;
+      }
+      html.dark .field::placeholder {
+        color: #55555e !important;
+      }
+      html.dark .bg-brandDim {
+        background-color: #1a1f3a !important;
+      }
+      html.dark .text-brand {
+        color: #5b7ef0 !important;
+      }
+      html.dark .bg-blue-50 {
+        background-color: #111827 !important;
+      }
+      html.dark .border-blue-200 {
+        border-color: #1e3a8a !important;
+      }
+      html.dark .text-blue-700 {
+        color: #93c5fd !important;
+      }
+      html.dark .bg-amber-50 {
+        background-color: #2a1f0a !important;
+      }
+      html.dark .border-amber-200 {
+        border-color: #713f12 !important;
+      }
+      html.dark .text-amber-700 {
+        color: #fcd34d !important;
+      }
+      html.dark .bg-red-50 {
+        background-color: #2a0f0f !important;
+      }
+      html.dark .border-red-200 {
+        border-color: #7f1d1d !important;
+      }
+      html.dark .text-red-500 {
+        color: #f87171 !important;
+      }
+      html.dark .hover\:bg-red-50:hover {
+        background-color: #3a0f0f !important;
+      }
+      html.dark .hover\:bg-red-100:hover {
+        background-color: #4a1515 !important;
+      }
+      html.dark .bg-green-50 {
+        background-color: #0f2a1a !important;
+      }
+      html.dark .border-green-200 {
+        border-color: #166534 !important;
+      }
+      html.dark .text-green-700 {
+        color: #86efac !important;
+      }
+      html.dark .bg-black\/25 {
+        background-color: rgba(0, 0, 0, 0.55) !important;
+      }
+      html.dark input[type='range'] {
+        accent-color: #5b7ef0;
+      }
+      html.dark .text-ok {
+        color: #4ade80 !important;
+      }
+      html.dark .text-danger {
+        color: #f87171 !important;
+      }
+      html.dark .text-warn {
+        color: #fbbf24 !important;
+      }
+      html.dark .bg-green-500 {
+        background-color: #22c55e !important;
+      }
+      html.dark .hover\:bg-green-600:hover {
+        background-color: #16a34a !important;
+      }
+      html.dark .bg-brand {
+        background-color: #4a6ef0 !important;
+      }
+      html.dark .hover\:bg-brandH:hover {
+        background-color: #3b5bdb !important;
+      }
+      html.dark #statusBar {
+        background-color: #15151a !important;
+        border-color: #25252c !important;
+      }
+      html.dark #statusFill {
+        background-color: rgba(91, 126, 240, 0.1) !important;
+      }
+      html.dark #titlebar {
+        background-color: #15151a !important;
+        border-color: #25252c !important;
+      }
+      html.dark #loginScreen {
+        background-color: #0c0c10 !important;
+      }
+      html.dark aside {
+        background-color: #0f0f14 !important;
+        border-color: #25252c !important;
+      }
+      html.dark main {
+        background-color: #0c0c10 !important;
       }
     </style>
+    <script>
+      try {
+        const s = JSON.parse(localStorage.getItem('jonuffy.cfg.v2') || '{}');
+        if (s.darkMode) document.documentElement.classList.add('dark');
+      } catch {}
+    </script>
   </head>
 
   <body
     class="bg-white text-gray-900 h-screen flex flex-col overflow-hidden select-none font-sans text-sm antialiased"
   >
     <div
+      id="loginScreen"
+      class="hidden fixed inset-0 bg-white z-50 flex flex-col items-center justify-center"
+    >
+      <div class="w-72 px-2">
+        <div class="flex flex-col items-center mb-7">
+          <img src="assets/logo.png" class="h-10 w-10 object-contain mb-2.5" />
+          <h1 class="text-[17px] font-semibold">Jonuffy Spoofer</h1>
+          <p class="text-[11px] text-gray-400 mt-1">Sign in to get started</p>
+        </div>
+        <div class="space-y-2.5">
+          <div>
+            <label
+              class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
+              >Roblox Cookie</label
+            >
+            <input
+              type="password"
+              id="loginCookie"
+              autocomplete="off"
+              class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] placeholder-gray-400 transition-colors"
+              placeholder=".ROBLOSECURITY value"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
+              >Open Cloud API Key</label
+            >
+            <div class="flex gap-2">
+              <input
+                type="password"
+                id="loginApiKey"
+                autocomplete="off"
+                class="field flex-1 px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] placeholder-gray-400 transition-colors"
+                placeholder="Read &amp; Write Assets"
+              />
+              <button
+                id="btnLoginGetKey"
+                class="px-3 py-2 bg-gray-100 text-gray-600 text-[11px] font-medium hover:bg-gray-200 transition-colors whitespace-nowrap"
+              >
+                Get Key
+              </button>
+            </div>
+          </div>
+          <p id="loginError" class="hidden text-[11px] text-red-500 text-center pt-0.5"></p>
+          <button
+            id="btnLogin"
+            class="no-drag w-full py-2.5 bg-brand text-white font-semibold hover:bg-brandH flex items-center justify-center gap-2 text-[12px] transition-colors"
+          >
+            <i data-lucide="log-in" class="w-3.5 h-3.5"></i> Sign In
+          </button>
+        </div>
+        <p id="loginStatus" class="text-[11px] text-gray-400 text-center mt-3 min-h-4"></p>
+      </div>
+    </div>
+
+    <div
       id="titlebar"
-      class="titlebar-drag h-11 bg-white border-b border-gray-200 flex items-center justify-between px-4 flex-shrink-0"
+      class="drag h-11 bg-white border-b border-gray-200 flex items-center justify-between px-4 flex-shrink-0"
     >
       <div class="flex items-center gap-2">
-        <img src="assets/logo.png" alt="" class="h-6 w-6 object-contain" />
-        <span class="font-semibold text-gray-800 text-[13px]">Jonuffy Spoofer</span>
-        <span id="version-text" class="text-[11px] text-gray-400 font-mono">v?</span>
+        <img src="assets/logo.png" class="h-5 w-5 object-contain" />
+        <span id="versionText" class="text-[10px] text-gray-400 font-mono">v?</span>
       </div>
       <div class="no-drag flex items-center gap-0.5">
         <button
-          id="minimize-btn"
+          id="btnMin"
           class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
         >
           <i data-lucide="minus" class="w-3.5 h-3.5"></i>
         </button>
         <button
-          id="close-btn"
+          id="btnClose"
           class="p-1.5 text-gray-400 hover:text-white hover:bg-danger transition-colors"
         >
           <i data-lucide="x" class="w-3.5 h-3.5"></i>
@@ -122,487 +353,162 @@
     <div class="flex flex-1 overflow-hidden">
       <aside class="w-48 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
         <nav class="p-2 flex flex-col gap-0.5 flex-1">
-          <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
-            data-nav="run"
-          >
-            <i data-lucide="zap" class="w-3.5 h-3.5 flex-shrink-0"></i> Run
+          <button class="nav on" data-p="home">
+            <i data-lucide="house" class="w-3.5 h-3.5 flex-shrink-0"></i> Home
           </button>
-          <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
-            data-nav="credentials"
-          >
-            <i data-lucide="key-round" class="w-3.5 h-3.5 flex-shrink-0"></i> Credentials
-          </button>
-          <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
-            data-nav="history"
-          >
-            <i data-lucide="history" class="w-3.5 h-3.5 flex-shrink-0"></i> History
-          </button>
-          <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
-            data-nav="plugin"
-          >
-            <i data-lucide="puzzle" class="w-3.5 h-3.5 flex-shrink-0"></i> Plugin
-          </button>
-          <button
-            class="nav-item w-full flex items-center gap-2.5 px-3 py-2 text-[13px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
-            data-nav="settings"
-          >
+          <button class="nav" data-p="settings">
             <i data-lucide="settings" class="w-3.5 h-3.5 flex-shrink-0"></i> Settings
           </button>
         </nav>
-        <div class="p-2 border-t border-gray-200">
+        <div class="p-2 border-t border-gray-200 space-y-0.5">
           <button
-            id="update-btn"
-            class="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left"
+            id="btnProfile"
+            class="hidden w-full flex items-center gap-2 px-2 py-2 hover:bg-gray-50 transition-colors text-left min-w-0"
           >
-            <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Update
-          </button>
-          <button
-            id="uninstall-btn"
-            class="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-medium text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors text-left"
-          >
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Uninstall
-          </button>
-          <div id="sidebar-account" class="hidden px-2 pt-2 flex items-center gap-2 min-w-0">
             <img
-              id="sidebar-avatar"
+              id="sidebarAvatar"
               src=""
-              alt=""
-              class="w-6 h-6 object-cover bg-gray-100 flex-shrink-0"
+              class="w-7 h-7 rounded-full object-cover bg-gray-100 flex-shrink-0 border border-gray-200"
             />
-            <div class="min-w-0">
+            <div class="min-w-0 flex-1">
               <p
-                id="sidebar-display-name"
+                id="sidebarName"
                 class="text-[11px] font-semibold text-gray-700 truncate leading-tight"
               ></p>
-              <p id="sidebar-username" class="text-[10px] text-gray-400 truncate leading-tight"></p>
+              <p id="sidebarUser" class="text-[10px] text-gray-400 truncate leading-tight"></p>
             </div>
-          </div>
+            <i data-lucide="chevron-right" class="w-3 h-3 text-gray-300 flex-shrink-0"></i>
+          </button>
+          <button
+            id="btnShowLogin"
+            class="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-medium text-brand hover:bg-brandDim transition-colors text-left"
+          >
+            <i data-lucide="log-in" class="w-3.5 h-3.5"></i> Sign In
+          </button>
         </div>
       </aside>
 
       <main class="flex-1 overflow-y-auto bg-gray-50">
-        <div id="page-run" class="tab-content active p-4 space-y-3 page-enter">
+        <div id="pageHome" class="page on p-4 space-y-3">
           <div
-            id="studio-banner"
+            id="studioBanner"
             class="hidden bg-blue-50 border border-blue-200 px-3 py-2 flex items-center gap-2"
           >
-            <span
-              id="studio-status-dot"
-              class="w-1.5 h-1.5 bg-green-500 flex-shrink-0"
-              style="border-radius: 50%"
-            ></span>
+            <span id="studioDot" class="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0"></span>
             <span class="text-[12px] text-blue-700"
-              >Studio connected — <span id="studio-place-name" class="font-semibold"></span
+              >Studio connected — <strong id="studioPlace"></strong
             ></span>
           </div>
 
-          <div class="bg-white border border-gray-200 p-4">
-            <div class="relative mb-3">
-              <label
-                id="asset-label"
-                class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
-                >Asset IDs</label
-              >
-              <textarea
-                id="animationId"
-                readonly
-                rows="5"
-                class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 placeholder-gray-400 resize-none font-mono transition-colors"
-                placeholder="Scan from Studio to populate"
-              ></textarea>
-              <div
-                id="scan-status-badge"
-                class="absolute top-8 right-2 px-2 py-0.5 bg-brand/10 text-brand text-[11px] font-medium hidden"
-              >
-                Scanning...
-              </div>
+          <div class="bg-white border border-gray-200 p-4 space-y-3">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Live Log</p>
+            <div
+              id="liveLog"
+              class="w-full h-56 px-3 py-2 bg-gray-950 border border-gray-800 text-[11px] font-mono overflow-y-auto leading-relaxed whitespace-pre-wrap break-all"
+            >
+              <span class="text-gray-600">Log will appear here when running...</span>
             </div>
-
-            <div class="flex gap-2">
-              <button
-                id="scan-btn"
-                disabled
-                class="flex-1 py-2 bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-[12px] transition-colors"
-              >
-                <i data-lucide="search" class="w-3.5 h-3.5"></i> Scan Animations
-              </button>
-              <button
-                id="run-spoofer-btn"
-                disabled
-                class="flex-1 py-2 bg-brand text-white font-semibold hover:bg-brandHover disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-[12px] transition-colors"
-              >
-                <i data-lucide="play" class="w-3.5 h-3.5"></i> Run Spoofer
-              </button>
-              <button
-                id="pause-spoofer-btn"
-                class="hidden px-3 py-2 bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 flex items-center gap-1.5 text-[12px] transition-colors"
-              >
-                <i data-lucide="pause" class="w-3.5 h-3.5"></i> Pause
-              </button>
-            </div>
-          </div>
-
-          <div id="scan-progress-card" class="hidden bg-white border border-gray-200 p-3">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider"
-                >Scanning</span
-              >
-              <span id="scan-progress-pct" class="text-[11px] font-mono text-brand font-semibold"
-                >0%</span
-              >
-            </div>
-            <div class="h-1 bg-gray-100 overflow-hidden">
-              <div
-                id="scan-progress-bar"
-                class="h-full bg-brand transition-all duration-200"
-                style="width: 0%"
-              ></div>
-            </div>
-            <p id="scan-progress-found" class="text-[11px] text-gray-400 mt-1.5">
-              Finding animations...
-            </p>
-          </div>
-
-          <div class="bg-white border border-gray-200 p-4">
-            <div class="flex items-center justify-between mb-2">
-              <label class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider"
-                >Output / Replace</label
-              >
-              <button
-                id="copy-output-btn"
-                class="p-1 text-gray-400 hover:text-brand transition-colors"
-              >
-                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-            <textarea
-              id="output-data"
-              readonly
-              rows="5"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] text-gray-600 resize-none font-mono focus:outline-none"
-              placeholder="Mappings appear here after run..."
-            ></textarea>
-            <div class="flex items-center gap-2 mt-2.5">
+            <div class="flex gap-2 items-center">
               <select
                 id="groupId"
-                class="field flex-1 px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 transition-colors"
+                class="field flex-1 px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 transition-colors appearance-none"
               >
                 <option value="">Personal (default)</option>
               </select>
               <button
-                id="send-replace-btn"
-                disabled
-                class="flex-1 py-1.5 bg-brand text-white font-semibold hover:bg-brandHover disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 text-[12px] transition-colors"
+                id="btnRun"
+                class="flex-1 py-2 bg-brand text-white font-semibold hover:bg-brandH flex items-center justify-center gap-1.5 text-[12px] transition-colors"
               >
-                <i data-lucide="send" class="w-3.5 h-3.5"></i> Send to Studio
+                <i data-lucide="play" class="w-3.5 h-3.5"></i> Run Spoofer
+              </button>
+              <button
+                id="btnPause"
+                class="hidden px-3 py-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center gap-1.5 text-[12px] transition-colors"
+              >
+                <i data-lucide="pause" class="w-3.5 h-3.5"></i>
+              </button>
+              <button
+                id="btnStop"
+                class="hidden px-3 py-2 bg-white border border-red-200 text-red-500 hover:bg-red-50 flex items-center gap-1.5 text-[12px] transition-colors"
+              >
+                <i data-lucide="square" class="w-3.5 h-3.5"></i>
               </button>
             </div>
-            <p id="group-permission-warning" class="hidden text-[11px] text-red-500 mt-1.5"></p>
+            <p id="groupPermWarn" class="hidden text-[11px] text-red-500"></p>
           </div>
         </div>
 
-        <div id="page-credentials" class="tab-content p-4 space-y-3 page-enter">
+        <div id="pageSettings" class="page p-4 space-y-3">
           <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Credentials</h2>
-            <div class="space-y-3">
-              <div>
-                <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
-                  >Roblox Cookie</label
-                >
-                <input
-                  type="password"
-                  id="robloxCookie"
-                  autocomplete="off"
-                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] text-gray-800 placeholder-gray-400 transition-colors"
-                  placeholder=".ROBLOSECURITY value"
-                />
-              </div>
-              <div>
-                <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
-                  >Open Cloud API Key</label
-                >
-                <div class="flex gap-2">
-                  <input
-                    type="password"
-                    id="openCloudApiKey"
-                    autocomplete="off"
-                    class="field flex-1 px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] text-gray-800 placeholder-gray-400 transition-colors"
-                    placeholder="Requires Read & Write Assets permission"
-                  />
-                  <button
-                    id="get-open-cloud-key-btn"
-                    class="px-3 py-2 bg-brand text-white text-[12px] font-semibold hover:bg-brandHover transition-colors whitespace-nowrap"
-                  >
-                    Get Key
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="account-info-card" class="hidden bg-white border border-gray-200 p-4">
-            <div class="flex items-center gap-3">
-              <img
-                id="account-avatar"
-                src=""
-                alt=""
-                class="w-9 h-9 object-cover bg-gray-100 flex-shrink-0"
-              />
-              <div class="min-w-0 flex-1">
-                <p
-                  id="account-display-name"
-                  class="text-[13px] font-semibold text-gray-800 truncate"
-                ></p>
-                <p id="account-username" class="text-[11px] text-gray-400 truncate"></p>
-                <p id="account-userid" class="text-[10px] text-gray-300 truncate"></p>
-              </div>
-              <div id="account-verified-badge" class="hidden flex-shrink-0">
-                <i data-lucide="check-circle" class="w-4 h-4 text-brand"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="page-history" class="tab-content p-4 space-y-3 page-enter">
-          <div class="bg-white border border-gray-200 p-4">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-[13px] font-semibold text-gray-800">Saved Sessions</h2>
-              <button
-                id="refresh-sessions-btn"
-                class="p-1 text-gray-400 hover:text-brand transition-colors"
-              >
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-            <select
-              id="history-runs-dropdown"
-              class="field w-full px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 mb-2.5 transition-colors"
-            >
-              <option value="">— no saved sessions —</option>
-            </select>
-            <div class="flex gap-2">
-              <button
-                id="load-session-btn"
-                disabled
-                class="flex-1 py-1.5 bg-brand text-white text-[12px] font-semibold hover:bg-brandHover disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> Load Session
-              </button>
-              <button
-                id="delete-session-btn"
-                disabled
-                class="px-3 py-1.5 bg-gray-100 text-red-500 text-[12px] font-medium hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition-colors"
-              >
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-          </div>
-          <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-1">Run Report</h2>
-            <p id="run-report-mode" class="text-[11px] text-gray-400 mb-3">No run yet</p>
-            <div id="run-report-grid" class="grid grid-cols-3 gap-2"></div>
-            <div id="run-report-failures" class="mt-3"></div>
-          </div>
-          <div class="bg-white border border-gray-200 p-4">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-[13px] font-semibold text-gray-800">Transfer Log</h2>
-              <div class="flex gap-2">
-                <input
-                  type="text"
-                  id="history-search"
-                  placeholder="Search..."
-                  class="px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand w-32"
-                />
-                <select
-                  id="history-filter"
-                  class="px-2.5 py-1.5 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 focus:outline-none focus:border-brand"
-                >
-                  <option value="all">All</option>
-                  <option value="completed">Done</option>
-                  <option value="error">Failed</option>
-                  <option value="processing">Active</option>
-                </select>
-              </div>
-            </div>
-            <div id="queue-counts" class="flex flex-wrap gap-1.5 mb-2.5"></div>
-            <div id="queue-list" class="space-y-1.5 max-h-80 overflow-y-auto">
-              <div
-                class="text-center text-[13px] text-gray-400 py-10 border border-gray-100 bg-gray-50"
-              >
-                No transfers yet.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="page-plugin" class="tab-content p-4 space-y-3 page-enter">
-          <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-1">Roblox Studio Plugin</h2>
-            <p class="text-[12px] text-gray-400 mb-3">
-              Installs the Jonuffy Spoofer plugin into Roblox Studio's local plugins folder.
+            <h2 class="text-[12px] font-semibold text-gray-800 mb-1">Studio Plugin</h2>
+            <p class="text-[11px] text-gray-400 mb-3">
+              Install the plugin into Roblox Studio's local plugins folder.
             </p>
             <div
-              id="plugin-status-banner"
-              class="hidden mb-3 px-3 py-2 border text-[12px] font-medium"
+              id="pluginBanner"
+              class="hidden mb-3 px-3 py-2 border text-[11px] font-medium"
             ></div>
             <div
-              id="plugin-path-row"
+              id="pluginStatusRow"
               class="hidden mb-3 flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200"
             >
               <i data-lucide="folder" class="w-3.5 h-3.5 text-gray-400 flex-shrink-0"></i>
               <span
-                id="plugin-path-text"
-                class="text-[11px] text-gray-500 font-mono truncate flex-1"
+                id="pluginPathText"
+                class="text-[10px] text-gray-500 font-mono truncate flex-1"
               ></span>
+              <span
+                id="pluginVersionBadge"
+                class="text-[10px] text-gray-400 flex-shrink-0 font-mono"
+              ></span>
+            </div>
+            <div
+              id="pluginUpdateBanner"
+              class="hidden mb-3 px-3 py-2 bg-amber-50 border border-amber-200 flex items-center gap-2"
+            >
+              <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5 text-amber-600 flex-shrink-0"></i>
+              <span id="pluginUpdateText" class="text-[11px] text-amber-700 flex-1"></span>
             </div>
             <div class="flex gap-2">
               <button
-                id="install-plugin-btn"
-                class="flex-1 py-2 bg-brand text-white font-semibold hover:bg-brandHover flex items-center justify-center gap-1.5 text-[12px] transition-colors"
+                id="btnInstallPlugin"
+                class="flex-1 py-2 bg-brand text-white font-semibold hover:bg-brandH flex items-center justify-center gap-1.5 text-[12px] transition-colors"
               >
                 <i data-lucide="download" class="w-3.5 h-3.5"></i> Install Plugin
               </button>
               <button
-                id="update-plugin-btn"
-                class="hidden flex-1 py-2 bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 flex items-center justify-center gap-1.5 text-[12px] transition-colors"
+                id="btnUpdatePlugin"
+                class="hidden flex-1 py-2 bg-amber-500 text-white font-semibold hover:bg-amber-600 flex items-center justify-center gap-1.5 text-[12px] transition-colors"
               >
                 <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Update Plugin
               </button>
               <button
-                id="open-plugins-folder-btn"
-                class="px-3 py-2 bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors flex items-center gap-1.5 text-[12px]"
+                id="btnOpenPluginsFolder"
+                class="px-3 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors flex items-center gap-1.5 text-[12px]"
               >
                 <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </div>
-          <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">How to use</h2>
-            <ol class="space-y-2.5">
-              <li class="flex gap-2.5">
-                <span
-                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
-                  >1</span
-                >
-                <span class="text-[12px] text-gray-500"
-                  >Go to <strong class="text-gray-700">Credentials</strong> and paste your
-                  <code class="font-mono text-[11px]">.ROBLOSECURITY</code> cookie and an Open Cloud
-                  API key with
-                  <strong class="text-gray-700">Read &amp; Write Assets</strong> permission.</span
-                >
-              </li>
-              <li class="flex gap-2.5">
-                <span
-                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
-                  >2</span
-                >
-                <span class="text-[12px] text-gray-500"
-                  >Click <strong class="text-gray-700">Install Plugin</strong>. It copies
-                  automatically to your Roblox Studio plugins folder. Restart Studio if it is
-                  already open.</span
-                >
-              </li>
-              <li class="flex gap-2.5">
-                <span
-                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
-                  >3</span
-                >
-                <span class="text-[12px] text-gray-500"
-                  >Go to <strong class="text-gray-700">Run</strong> → click
-                  <strong class="text-gray-700">Scan Animations</strong>. The plugin scans all
-                  Animation objects and script sources in your place.</span
-                >
-              </li>
-              <li class="flex gap-2.5">
-                <span
-                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
-                  >4</span
-                >
-                <span class="text-[12px] text-gray-500"
-                  >Click <strong class="text-gray-700">Run Spoofer</strong>. Assets are downloaded
-                  and re-uploaded to your account or group via Open Cloud.</span
-                >
-              </li>
-              <li class="flex gap-2.5">
-                <span
-                  class="w-4 h-4 bg-brand text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
-                  >5</span
-                >
-                <span class="text-[12px] text-gray-500"
-                  >Click <strong class="text-gray-700">Send to Studio</strong>. The plugin replaces
-                  all old IDs in the place instantly.</span
-                >
-              </li>
-            </ol>
-          </div>
-        </div>
-
-        <div id="page-settings" class="tab-content p-4 space-y-3 page-enter">
-          <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">General</h2>
-            <div class="space-y-3">
-              <div>
-                <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
-                  >Default Output Folder</label
-                >
-                <div class="flex gap-2">
-                  <input
-                    type="text"
-                    id="default-output-folder"
-                    readonly
-                    class="field flex-1 px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] placeholder-gray-400 transition-colors"
-                    placeholder="Optional"
-                  />
-                  <button
-                    id="default-folder-browse-btn"
-                    class="px-3 py-2 bg-gray-100 text-gray-700 text-[12px] font-medium hover:bg-gray-200 transition-colors"
-                  >
-                    Browse
-                  </button>
-                </div>
-              </div>
-              <div class="flex items-center justify-between py-1">
-                <span class="text-[13px] text-gray-700">Auto-save sessions</span>
-                <button
-                  id="auto-save-toggle"
-                  class="toggle relative w-8 h-4 bg-brand"
-                  data-on="true"
-                >
-                  <span
-                    class="absolute top-0.5 left-0.5 w-3 h-3 bg-white transition-transform duration-150"
-                  ></span>
-                </button>
-              </div>
-            </div>
-          </div>
 
           <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Spoofer Options</h2>
+            <h2 class="text-[12px] font-semibold text-gray-800 mb-3">Spoofer Options</h2>
             <div class="space-y-3">
               <div class="flex items-center justify-between py-1">
                 <div>
-                  <span class="text-[13px] text-gray-700">Download Only</span>
-                  <p class="text-[11px] text-gray-400 mt-0.5">
-                    Download assets without re-uploading
-                  </p>
+                  <p class="text-[13px] text-gray-700">Download Only</p>
+                  <p class="text-[11px] text-gray-400 mt-0.5">Skip re-upload</p>
                 </div>
                 <button
-                  id="download-only-toggle"
-                  class="toggle relative w-8 h-4 bg-gray-200"
-                  data-on="false"
+                  id="togDownloadOnly"
+                  class="tog relative w-8 h-[17px] rounded-full bg-gray-300 border-0 cursor-pointer flex-shrink-0 transition-[background] duration-150"
                 >
                   <span
-                    class="absolute top-0.5 left-0.5 w-3 h-3 bg-white transition-transform duration-150"
+                    class="absolute top-0.5 left-0.5 w-[13px] h-[13px] bg-white rounded-full transition-transform duration-150 shadow-[0_1px_2px_rgba(0,0,0,0.15)]"
                   ></span>
                 </button>
               </div>
-              <div id="download-folder-row" class="hidden flex gap-2">
+              <div id="dlFolderRow" class="hidden flex gap-2">
                 <input
                   type="text"
                   id="downloadFolder"
@@ -611,26 +517,23 @@
                   placeholder="Select folder..."
                 />
                 <button
-                  id="select-folder-btn"
-                  class="px-3 py-2 bg-brand text-white text-[12px] font-semibold hover:bg-brandHover transition-colors flex items-center gap-1"
+                  id="btnSelectFolder"
+                  class="px-3 py-2 bg-brand text-white text-[12px] font-semibold hover:bg-brandH transition-colors flex items-center gap-1"
                 >
                   <i data-lucide="folder" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
               <div class="flex items-center justify-between py-1">
                 <div>
-                  <span class="text-[13px] text-gray-700">Enable Spoofing</span>
-                  <p class="text-[11px] text-gray-400 mt-0.5">
-                    Download and re-upload to your account
-                  </p>
+                  <p class="text-[13px] text-gray-700">Enable Spoofing</p>
+                  <p class="text-[11px] text-gray-400 mt-0.5">Download and re-upload</p>
                 </div>
                 <button
-                  id="enable-spoofing-toggle"
-                  class="toggle relative w-8 h-4 bg-brand"
-                  data-on="true"
+                  id="togSpoofing"
+                  class="tog on relative w-8 h-[17px] rounded-full bg-gray-300 border-0 cursor-pointer flex-shrink-0 transition-[background] duration-150"
                 >
                   <span
-                    class="absolute top-0.5 left-0.5 w-3 h-3 bg-white transition-transform duration-150"
+                    class="absolute top-0.5 left-0.5 w-[13px] h-[13px] bg-white rounded-full transition-transform duration-150 shadow-[0_1px_2px_rgba(0,0,0,0.15)]"
                   ></span>
                 </button>
               </div>
@@ -638,13 +541,12 @@
           </div>
 
           <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Concurrency</h2>
+            <h2 class="text-[12px] font-semibold text-gray-800 mb-3">Concurrency</h2>
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
-                  >Upload —
-                  <span id="upload-conc-val" class="font-mono text-gray-600">10</span></label
+                  class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  >Upload — <span id="ulConcVal" class="font-mono text-gray-600">10</span></label
                 >
                 <input
                   type="range"
@@ -657,9 +559,8 @@
               </div>
               <div>
                 <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
-                  >Download —
-                  <span id="download-conc-val" class="font-mono text-gray-600">10</span></label
+                  class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  >Download — <span id="dlConcVal" class="font-mono text-gray-600">10</span></label
                 >
                 <input
                   type="range"
@@ -674,74 +575,69 @@
           </div>
 
           <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Advanced</h2>
+            <h2 class="text-[12px] font-semibold text-gray-800 mb-3">Advanced</h2>
             <div class="grid grid-cols-2 gap-2.5">
               <div>
                 <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
                   >Max Place IDs</label
-                >
-                <input
+                ><input
                   type="number"
                   id="maxPlaceIds"
                   value="10"
                   min="10"
                   max="50"
-                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] transition-colors"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] transition-colors"
                 />
               </div>
               <div>
                 <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
                   >Max Retries</label
-                >
-                <input
+                ><input
                   type="number"
                   id="maxPlaceIdRetries"
                   value="3"
                   min="1"
                   max="10"
-                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] transition-colors"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] transition-colors"
                 />
               </div>
               <div>
                 <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
                   >Upload Retries</label
-                >
-                <input
+                ><input
                   type="number"
                   id="uploadRetries"
                   value="3"
                   min="1"
                   max="10"
-                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] transition-colors"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] transition-colors"
                 />
               </div>
               <div>
                 <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
                   >Retry Delay (ms)</label
-                >
-                <input
+                ><input
                   type="number"
                   id="uploadRetryDelay"
                   value="5000"
                   min="1000"
                   max="60000"
                   step="1000"
-                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] transition-colors"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] transition-colors"
                 />
               </div>
               <div class="col-span-2">
                 <label
-                  class="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5"
+                  class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
                   >Override Place ID</label
-                >
-                <input
+                ><input
                   type="text"
                   id="overridePlaceId"
-                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[13px] placeholder-gray-400 transition-colors"
+                  class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] placeholder-gray-400 transition-colors"
                   placeholder="Leave empty to auto-fetch"
                 />
               </div>
@@ -749,40 +645,183 @@
           </div>
 
           <div class="bg-white border border-gray-200 p-4">
-            <h2 class="text-[13px] font-semibold text-gray-800 mb-3">Data</h2>
-            <div class="flex gap-2">
+            <h2 class="text-[12px] font-semibold text-gray-800 mb-3">App</h2>
+            <div class="flex items-center justify-between py-1 mb-3">
+              <div>
+                <p class="text-[13px] text-gray-700">Dark Theme</p>
+                <p class="text-[11px] text-gray-400 mt-0.5">Toggle dark appearance</p>
+              </div>
               <button
-                id="clear-history-btn"
-                class="flex-1 py-2 bg-gray-100 text-gray-700 text-[12px] font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5"
+                id="togDark"
+                class="tog relative w-8 h-[17px] rounded-full bg-gray-300 border-0 cursor-pointer flex-shrink-0 transition-[background] duration-150"
+              >
+                <span
+                  class="absolute top-0.5 left-0.5 w-[13px] h-[13px] bg-white rounded-full transition-transform duration-150 shadow-[0_1px_2px_rgba(0,0,0,0.15)]"
+                ></span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                id="btnUpdate"
+                class="py-2 bg-gray-50 border border-gray-200 text-gray-700 text-[11px] font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Check Update
+              </button>
+              <button
+                id="btnClearHistory"
+                class="py-2 bg-gray-50 border border-gray-200 text-gray-700 text-[11px] font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-1.5"
               >
                 <i data-lucide="trash" class="w-3.5 h-3.5"></i> Clear History
               </button>
               <button
-                id="reset-settings-btn"
-                class="flex-1 py-2 bg-gray-100 text-gray-700 text-[12px] font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-1.5"
+                id="btnResetSettings"
+                class="py-2 bg-gray-50 border border-gray-200 text-gray-700 text-[11px] font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-1.5"
               >
                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Settings
               </button>
+              <button
+                id="btnUninstall"
+                class="py-2 bg-red-50 border border-red-200 text-red-500 text-[11px] font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Uninstall
+              </button>
             </div>
-            <p class="text-[11px] text-gray-400 text-center mt-3 pt-3 border-t border-gray-100">
-              Jonuffy Spoofer — Electron · Roblox Open Cloud API
-            </p>
           </div>
         </div>
       </main>
     </div>
 
-    <div class="bg-white border-t border-gray-200 px-4 h-8 flex items-center gap-2 flex-shrink-0">
+    <div
+      id="statusBar"
+      class="bg-white border-t border-gray-200 px-4 h-8 flex items-center gap-2 flex-shrink-0 relative overflow-hidden"
+    >
+      <div
+        id="statusFill"
+        style="width: 0%"
+        class="absolute left-0 top-0 bottom-0 bg-[rgba(59,91,219,0.08)] transition-[width] duration-300 pointer-events-none"
+      ></div>
       <span
-        id="status-dot"
-        class="w-1.5 h-1.5 bg-gray-300 flex-shrink-0"
-        style="border-radius: 50%"
+        id="statusDot"
+        class="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0 relative z-10"
       ></span>
-      <span id="status-text" class="text-[12px] text-gray-500">Ready</span>
+      <span id="statusText" class="text-[11px] text-gray-500 relative z-10 flex-1 truncate"
+        >Ready</span
+      >
+      <span
+        id="statusCount"
+        class="hidden text-[10px] font-mono text-gray-400 relative z-10 flex-shrink-0"
+      ></span>
     </div>
 
     <div
-      id="uninstall-modal"
+      id="modalProfile"
+      class="fixed inset-0 bg-black/25 z-50 hidden items-center justify-center"
+    >
+      <div class="bg-white border border-gray-200 w-80">
+        <div class="p-5 flex items-center gap-3 border-b border-gray-100">
+          <img
+            id="profileAvatar"
+            src=""
+            class="w-12 h-12 rounded-full object-cover bg-gray-100 flex-shrink-0 border border-gray-200"
+          />
+          <div class="min-w-0 flex-1">
+            <p id="profileName" class="text-[14px] font-semibold text-gray-900 truncate"></p>
+            <p id="profileUser" class="text-[12px] text-gray-400 truncate"></p>
+            <p id="profileId" class="text-[10px] text-gray-300 font-mono truncate"></p>
+          </div>
+          <i data-lucide="check-circle" class="w-4 h-4 text-brand flex-shrink-0"></i>
+        </div>
+        <div class="p-4 space-y-2">
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="bg-gray-50 border border-gray-100 px-3 py-2">
+              <span class="block text-gray-400 uppercase tracking-wider text-[10px] mb-0.5"
+                >Cookie</span
+              ><span id="profileCookieStatus" class="font-semibold"></span>
+            </div>
+            <div class="bg-gray-50 border border-gray-100 px-3 py-2">
+              <span class="block text-gray-400 uppercase tracking-wider text-[10px] mb-0.5"
+                >API Key</span
+              ><span id="profileApiStatus" class="font-semibold"></span>
+            </div>
+          </div>
+          <div class="pt-1 space-y-1.5">
+            <button
+              id="btnEditCreds"
+              class="w-full py-2 bg-gray-50 border border-gray-200 text-gray-700 text-[12px] font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-1.5"
+            >
+              <i data-lucide="key-round" class="w-3.5 h-3.5"></i> Update Credentials
+            </button>
+            <button
+              id="btnSignOut"
+              class="w-full py-2 bg-red-50 border border-red-200 text-red-500 text-[12px] font-medium hover:bg-red-100 transition-colors flex items-center justify-center gap-1.5"
+            >
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out
+            </button>
+          </div>
+        </div>
+        <div class="px-4 pb-4">
+          <button
+            id="btnCloseProfile"
+            class="w-full py-1.5 text-gray-400 text-[12px] hover:text-gray-600 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="modalCreds"
+      class="fixed inset-0 bg-black/25 z-[60] hidden items-center justify-center"
+    >
+      <div class="bg-white border border-gray-200 w-80 p-5">
+        <h2 class="text-[14px] font-semibold text-gray-800 mb-4">Update Credentials</h2>
+        <div class="space-y-3">
+          <div>
+            <label
+              class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
+              >Roblox Cookie</label
+            ><input
+              type="password"
+              id="editCookie"
+              autocomplete="off"
+              class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 placeholder-gray-400 transition-colors"
+              placeholder=".ROBLOSECURITY value"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1"
+              >Open Cloud API Key</label
+            ><input
+              type="password"
+              id="editApiKey"
+              autocomplete="off"
+              class="field w-full px-3 py-2 bg-gray-50 border border-gray-200 text-[12px] text-gray-800 placeholder-gray-400 transition-colors"
+              placeholder="Read &amp; Write Assets"
+            />
+          </div>
+          <p id="editCredsError" class="hidden text-[11px] text-red-500"></p>
+        </div>
+        <div class="flex gap-2 mt-4">
+          <button
+            id="btnSaveCreds"
+            class="flex-1 py-2 bg-brand text-white text-[12px] font-semibold hover:bg-brandH transition-colors"
+          >
+            Save
+          </button>
+          <button
+            id="btnCancelEditCreds"
+            class="flex-1 py-2 bg-gray-100 text-gray-600 text-[12px] hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="modalUninstall"
       class="fixed inset-0 bg-black/25 z-50 hidden items-center justify-center"
     >
       <div class="bg-white border border-gray-200 p-6 w-72 text-center">
@@ -796,16 +835,56 @@
           Removes all data, shortcuts, and the Studio plugin.
         </p>
         <button
-          id="confirm-uninstall-btn"
-          class="w-full py-2 bg-danger text-white text-[13px] font-semibold hover:bg-red-700 transition-colors mb-2"
+          id="btnConfirmUninstall"
+          class="w-full py-2 bg-danger text-white text-[12px] font-semibold hover:bg-red-700 transition-colors mb-2"
         >
           Confirm Uninstall
         </button>
         <button
-          id="cancel-uninstall-btn"
-          class="w-full py-2 bg-gray-100 text-gray-600 text-[13px] hover:bg-gray-200 transition-colors"
+          id="btnCancelUninstall"
+          class="w-full py-2 bg-gray-100 text-gray-600 text-[12px] hover:bg-gray-200 transition-colors"
         >
           Cancel
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="modalUpdate"
+      class="fixed inset-0 bg-black/25 z-[70] hidden items-center justify-center"
+    >
+      <div class="bg-white border border-gray-200 w-80 p-5">
+        <h2 id="updateTitle" class="text-[14px] font-semibold text-gray-800 mb-1">
+          Update Available
+        </h2>
+        <p id="updateSubtitle" class="text-[11px] text-gray-400 mb-4">Downloading...</p>
+        <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2">
+          <div
+            id="updateBar"
+            class="h-full bg-brand transition-[width] duration-200"
+            style="width: 0%"
+          ></div>
+        </div>
+        <p id="updatePct" class="text-[10px] text-gray-400 font-mono text-right mb-4">0%</p>
+        <div id="updateActions" class="flex gap-2">
+          <button
+            id="btnDownloadUpdate"
+            class="flex-1 py-2 bg-brand text-white text-[12px] font-semibold hover:bg-brandH transition-colors"
+          >
+            Download
+          </button>
+          <button
+            id="btnCancelUpdate"
+            class="flex-1 py-2 bg-gray-100 text-gray-600 text-[12px] hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+        <button
+          id="btnInstallUpdate"
+          class="hidden w-full py-2 bg-green-500 text-white text-[12px] font-semibold hover:bg-green-600 transition-colors"
+        >
+          Install & Restart
         </button>
       </div>
     </div>
@@ -813,243 +892,171 @@
     <script>
       lucide.createIcons();
 
-      const SETTINGS_KEY = 'jonuffy.cfg.v1';
-      const CREDS_KEY = 'jonuffy.auth.v1';
-      const GROUP_ID_KEY = 'jonuffy.grp.v1';
-      const DEFAULT_SETTINGS = {
-        defaultOutputFolder: '',
-        autoSaveSessions: true,
+      const SK = 'jonuffy.cfg.v2',
+        CK = 'jonuffy.auth.v1',
+        GK = 'jonuffy.grp.v1',
+        OK = 'jonuffy.onboarded.v1',
+        DK = 'jonuffy.dark.v1';
+      const DEF = {
         downloadOnly: false,
         enableSpoofing: true,
         uploadConcurrency: 10,
         downloadConcurrency: 10,
+        darkMode: false,
       };
 
-      const $id = id => document.getElementById(id);
-      const readJson = (k, fb) => {
+      const $ = id => document.getElementById(id);
+      const rj = (k, fb) => {
         try {
           return JSON.parse(localStorage.getItem(k) || '') || fb;
         } catch {
           return fb;
         }
       };
-      const writeJson = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+      const wj = (k, v) => localStorage.setItem(k, JSON.stringify(v));
       const esc = v =>
         String(v).replace(
           /[&<>'"]/g,
           c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]
         );
 
-      function setToggle(btn, on) {
-        const thumb = btn.querySelector('span');
-        btn.dataset.on = on ? 'true' : 'false';
-        if (on) {
-          btn.classList.replace('bg-gray-200', 'bg-brand');
-          thumb.style.transform = 'translateX(16px)';
-        } else {
-          btn.classList.replace('bg-brand', 'bg-gray-200');
-          thumb.style.transform = 'translateX(0)';
-        }
-      }
-
-      function bindToggle(btn, onChange) {
-        btn.addEventListener('click', () => {
-          const next = btn.dataset.on !== 'true';
-          setToggle(btn, next);
-          onChange(next);
+      const tog = (el, on) => {
+        el.classList.toggle('on', on);
+        el.dataset.on = on ? '1' : '0';
+        el.style.background = on ? '#3b5bdb' : '#d1d5db';
+        const sp = el.querySelector('span');
+        if (sp) sp.style.transform = on ? 'translateX(15px)' : '';
+      };
+      const isOn = el => el.dataset.on === '1';
+      const bindTog = (el, cb) =>
+        el.addEventListener('click', () => {
+          tog(el, !isOn(el));
+          cb(isOn(el));
         });
-      }
 
-      const toggleAutoSave = $id('auto-save-toggle');
-      const toggleDownloadOnly = $id('download-only-toggle');
-      const toggleSpoofing = $id('enable-spoofing-toggle');
+      const showEl = el => el.classList.remove('hidden');
+      const hideEl = el => el.classList.add('hidden');
+      const showM = id => {
+        const m = $(`modal${id}`);
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      };
+      const hideM = id => {
+        const m = $(`modal${id}`);
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+      };
 
-      bindToggle(toggleAutoSave, v => saveSettings({ autoSaveSessions: v }));
-      bindToggle(toggleSpoofing, v => saveSettings({ enableSpoofing: v }));
-      bindToggle(toggleDownloadOnly, v => {
-        $id('download-folder-row').classList.toggle('hidden', !v);
-        if (v) {
-          setToggle(toggleSpoofing, false);
-          toggleSpoofing.disabled = true;
-          toggleSpoofing.classList.add('opacity-40', 'cursor-not-allowed');
-        } else {
-          toggleSpoofing.disabled = false;
-          toggleSpoofing.classList.remove('opacity-40', 'cursor-not-allowed');
-        }
-        saveSettings({ downloadOnly: v });
-      });
+      let progressTotal = 0;
 
-      document.querySelectorAll('.nav-item[data-nav]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.nav-item').forEach(b => {
-            b.classList.remove('bg-brandDim', 'text-brand');
-            b.classList.add('text-gray-500');
-          });
-          document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
-          btn.classList.add('bg-brandDim', 'text-brand');
-          btn.classList.remove('text-gray-500');
-          const page = $id('page-' + btn.dataset.nav);
-          if (page) {
-            page.classList.add('active');
-            page.classList.remove('page-enter');
-            void page.offsetWidth;
-            page.classList.add('page-enter');
-          }
-          if (btn.dataset.nav === 'history') refreshRunsDropdown();
-        });
-      });
-
-      document
-        .querySelector('.nav-item[data-nav="run"]')
-        .classList.add('bg-brandDim', 'text-brand');
-      document.querySelector('.nav-item[data-nav="run"]').classList.remove('text-gray-500');
-
-      function updateStatus(msg) {
-        $id('status-text').textContent = msg || 'Ready';
-        const dot = $id('status-dot');
-        const c =
+      function setStatus(msg) {
+        $('statusText').textContent = msg || 'Ready';
+        $('statusDot').style.background =
           !msg || msg === 'Ready'
-            ? '#9ca3af'
+            ? '#d1d5db'
             : /error|fail|invalid/i.test(msg)
-              ? '#ef4444'
-              : /complete|done|success|copied|replaced/i.test(msg)
-                ? '#22c55e'
-                : '#f59e0b';
-        dot.style.background = c;
+              ? '#e03131'
+              : /done|complete|success|updated/i.test(msg)
+                ? '#2f9e44'
+                : '#e67700';
       }
 
-      function readSettings() {
-        return { ...DEFAULT_SETTINGS, ...readJson(SETTINGS_KEY, {}) };
+      function setProgress(pct, label) {
+        $('statusFill').style.width = pct + '%';
+        const c = $('statusCount');
+        if (label) {
+          c.textContent = label;
+          showEl(c);
+        } else hideEl(c);
       }
-      function saveSettings(partial = {}) {
-        const s = { ...readSettings(), ...partial };
-        writeJson(SETTINGS_KEY, s);
-        applySettings(s);
+
+      const readS = () => ({ ...DEF, ...rj(SK, {}) });
+      const saveS = p => {
+        const s = { ...readS(), ...p };
+        wj(SK, s);
         return s;
-      }
-      function applySettings(s = readSettings()) {
-        $id('default-output-folder').value = s.defaultOutputFolder || '';
-        setToggle(toggleAutoSave, s.autoSaveSessions !== false);
-        setToggle(toggleDownloadOnly, s.downloadOnly === true);
-        $id('download-folder-row').classList.toggle('hidden', !s.downloadOnly);
-        setToggle(toggleSpoofing, s.enableSpoofing !== false);
-        const uc = $id('uploadConcurrency');
-        uc.value = s.uploadConcurrency || 10;
-        $id('upload-conc-val').textContent = uc.value;
-        const dc = $id('downloadConcurrency');
-        dc.value = s.downloadConcurrency || 10;
-        $id('download-conc-val').textContent = dc.value;
+      };
+
+      function applyTheme() {
+        const s = readS();
+        const on = !!s.darkMode;
+        document.documentElement.classList.toggle('dark', on);
+        tog($('togDark'), on);
       }
 
-      function saveCredentials() {
-        writeJson(CREDS_KEY, {
-          robloxCookie: $id('robloxCookie').value,
-          apiKey: $id('openCloudApiKey').value,
-        });
-      }
-      function loadCredentials() {
-        const c = readJson(CREDS_KEY, {});
-        if (typeof c.robloxCookie === 'string') $id('robloxCookie').value = c.robloxCookie;
-        if (typeof c.apiKey === 'string') $id('openCloudApiKey').value = c.apiKey;
+      function applySettings() {
+        const s = readS();
+        tog($('togDownloadOnly'), s.downloadOnly);
+        tog($('togSpoofing'), s.enableSpoofing);
+        s.downloadOnly ? showEl($('dlFolderRow')) : hideEl($('dlFolderRow'));
+        $('uploadConcurrency').value = s.uploadConcurrency;
+        $('ulConcVal').textContent = s.uploadConcurrency;
+        $('downloadConcurrency').value = s.downloadConcurrency;
+        $('dlConcVal').textContent = s.downloadConcurrency;
+        applyTheme();
       }
 
-      $id('robloxCookie').addEventListener('change', () => {
-        saveCredentials();
-        refreshAccountInfo();
-        refreshGroupDropdown();
+      bindTog($('togDownloadOnly'), v => {
+        v ? showEl($('dlFolderRow')) : hideEl($('dlFolderRow'));
+        if (v) tog($('togSpoofing'), false);
+        saveS({ downloadOnly: v });
       });
-      $id('openCloudApiKey').addEventListener('change', saveCredentials);
-      $id('uploadConcurrency').addEventListener('input', e => {
-        $id('upload-conc-val').textContent = e.target.value;
-        saveSettings({ uploadConcurrency: parseInt(e.target.value) });
+      bindTog($('togSpoofing'), v => saveS({ enableSpoofing: v }));
+      bindTog($('togDark'), v => {
+        saveS({ darkMode: v });
+        applyTheme();
       });
-      $id('downloadConcurrency').addEventListener('input', e => {
-        $id('download-conc-val').textContent = e.target.value;
-        saveSettings({ downloadConcurrency: parseInt(e.target.value) });
+      $('uploadConcurrency').addEventListener('input', e => {
+        $('ulConcVal').textContent = e.target.value;
+        saveS({ uploadConcurrency: +e.target.value });
+      });
+      $('downloadConcurrency').addEventListener('input', e => {
+        $('dlConcVal').textContent = e.target.value;
+        saveS({ downloadConcurrency: +e.target.value });
+      });
+      $('btnSelectFolder').addEventListener('click', async () => {
+        const p = await window.api?.selectFolder();
+        if (p) $('downloadFolder').value = p;
       });
 
-      $id('groupId').addEventListener('change', async () => {
-        localStorage.setItem(GROUP_ID_KEY, $id('groupId').value);
-        const sel = $id('groupId').value;
-        const warn = $id('group-permission-warning');
-        const run = $id('run-spoofer-btn');
-        if (!sel) {
-          warn.classList.add('hidden');
-          if (studioConnected) run.disabled = false;
+      const getCreds = () => rj(CK, {});
+      const saveCreds = (cookie, apiKey) => wj(CK, { robloxCookie: cookie, apiKey });
+      let cachedUser = null;
+
+      async function refreshAccount() {
+        const c = getCreds();
+        if (!c.robloxCookie) {
+          cachedUser = null;
+          $('btnProfile').style.display = 'none';
+          showEl($('btnShowLogin'));
           return;
         }
-        const cookie = $id('robloxCookie').value;
-        const apiKey = $id('openCloudApiKey').value;
-        if (!cookie) return;
-        if (!apiKey) {
-          warn.textContent = 'API key required to verify group permissions';
-          warn.classList.remove('hidden');
-          run.disabled = true;
-          return;
-        }
-        warn.textContent = 'Checking permissions...';
-        warn.classList.remove('hidden');
-        run.disabled = true;
-        try {
-          const res = await window.electronAPI?.canUploadToGroup(cookie, sel, apiKey);
-          if (!res?.canUpload) {
-            warn.textContent = res?.reason || 'No upload permission for this group';
-            return;
-          }
-          warn.classList.add('hidden');
-          run.disabled = false;
-        } catch {
-          warn.textContent = 'Permission check failed';
-        }
-      });
-
-      async function refreshAccountInfo() {
-        const cookie = $id('robloxCookie').value;
-        if (!cookie) {
-          hideAccountInfo();
-          return;
-        }
-        const card = $id('account-info-card');
-        $id('account-display-name').textContent = 'Loading...';
-        $id('account-username').textContent = '';
-        card.classList.remove('hidden');
-        const info = await window.electronAPI?.fetchUserInfo(cookie);
+        const info = await window.api?.fetchUserInfo(c.robloxCookie);
         if (!info || info.error) {
-          hideAccountInfo();
+          cachedUser = null;
+          $('btnProfile').style.display = 'none';
+          showEl($('btnShowLogin'));
           return;
         }
-        if (info.avatarUrl) {
-          $id('sidebar-avatar').src = info.avatarUrl;
-          $id('account-avatar').src = info.avatarUrl;
-        }
-        $id('sidebar-display-name').textContent = info.displayName || info.name;
-        $id('sidebar-username').textContent = '@' + info.name;
-        $id('sidebar-account').classList.remove('hidden');
-        $id('account-display-name').textContent = info.displayName || info.name;
-        $id('account-username').textContent = '@' + info.name;
-        $id('account-userid').textContent = info.id ? 'ID: ' + info.id : '';
-        $id('account-verified-badge').classList.remove('hidden');
-        lucide.createIcons();
+        cachedUser = info;
+        if (info.avatarUrl) $('sidebarAvatar').src = info.avatarUrl;
+        $('sidebarName').textContent = info.displayName || info.name;
+        $('sidebarUser').textContent = '@' + info.name;
+        $('btnProfile').style.display = 'flex';
+        hideEl($('btnShowLogin'));
       }
 
-      function hideAccountInfo() {
-        $id('sidebar-account').classList.add('hidden');
-        $id('account-info-card').classList.add('hidden');
-        $id('account-verified-badge').classList.add('hidden');
-      }
-
-      async function refreshGroupDropdown() {
-        if (!window.electronAPI?.fetchUserGroups) return;
-        const sel = $id('groupId');
-        const cookie = $id('robloxCookie').value;
-        if (!cookie) {
+      async function refreshGroups() {
+        const sel = $('groupId'),
+          c = getCreds(),
+          saved = localStorage.getItem(GK);
+        if (!c.robloxCookie) {
           sel.innerHTML = '<option value="">Personal (default)</option>';
           return;
         }
-        const saved = localStorage.getItem(GROUP_ID_KEY);
-        sel.innerHTML = '<option value="">Loading groups...</option>';
+        sel.innerHTML = '<option value="">Loading...</option>';
         sel.disabled = true;
-        const groups = await window.electronAPI.fetchUserGroups(cookie);
+        const groups = await window.api?.fetchUserGroups(c.robloxCookie);
         sel.disabled = false;
         if (!groups || groups.error || !Array.isArray(groups) || !groups.length) {
           sel.innerHTML = '<option value="">Personal (default)</option>';
@@ -1064,541 +1071,438 @@
         }
       }
 
-      const queueItems = new Map();
-      let lastFailedInput = '';
-      let activeFilter = 'all';
-      let searchQuery = '';
-
-      $id('history-search').addEventListener('input', e => {
-        searchQuery = e.target.value.toLowerCase();
-        renderQueue();
-      });
-      $id('history-filter').addEventListener('change', e => {
-        activeFilter = e.target.value;
-        renderQueue();
-      });
-
-      function resetQueue() {
-        queueItems.clear();
-        lastFailedInput = '';
-        renderQueue();
-      }
-      function upsertQueueItem(u) {
-        if (!u?.id) return;
-        queueItems.set(u.id, { ...(queueItems.get(u.id) || {}), ...u });
-        renderQueue();
-      }
-
-      function renderQueue() {
-        let items = Array.from(queueItems.values());
-        const counts = items.reduce((a, i) => {
-          const s = i.status || 'queued';
-          a[s] = (a[s] || 0) + 1;
-          return a;
-        }, {});
-        if (activeFilter !== 'all') items = items.filter(i => i.status === activeFilter);
-        if (searchQuery)
-          items = items.filter(
-            i =>
-              (i.name || '').toLowerCase().includes(searchQuery) ||
-              String(i.originalAssetId || '').includes(searchQuery)
-          );
-        const total = queueItems.size;
-        $id('queue-counts').innerHTML = total
-          ? [
-              ['Total', total],
-              ['Active', (counts.processing || 0) + (counts.queued || 0)],
-              ['Done', counts.completed || 0],
-              ['Failed', counts.error || 0],
-            ]
-              .filter(([, v]) => v > 0)
-              .map(
-                ([l, v]) =>
-                  `<span class="px-2 py-0.5 bg-white border border-gray-200 text-[11px] text-gray-600">${esc(l)} <strong>${v}</strong></span>`
-              )
-              .join('')
-          : '';
-        const list = $id('queue-list');
-        if (!items.length) {
-          list.innerHTML =
-            '<div class="text-center text-[13px] text-gray-400 py-10 border border-gray-100 bg-gray-50">' +
-            (total ? 'No items match filter.' : 'No transfers yet.') +
-            '</div>';
+      $('groupId').addEventListener('change', async () => {
+        localStorage.setItem(GK, $('groupId').value);
+        const sel = $('groupId').value,
+          warn = $('groupPermWarn');
+        if (!sel) {
+          hideEl(warn);
           return;
         }
-        const sCls = {
-          processing: 'border-blue-100 bg-blue-50 text-blue-700',
-          cooldown: 'border-amber-100 bg-amber-50 text-amber-700',
-          queued: 'border-gray-200 bg-white text-gray-600',
-          error: 'border-red-100 bg-red-50 text-red-600',
-          completed: 'border-green-100 bg-green-50 text-green-700',
+        const c = getCreds();
+        if (!c.robloxCookie || !c.apiKey) {
+          warn.textContent = 'Cookie and API key required';
+          showEl(warn);
+          return;
+        }
+        warn.textContent = 'Checking...';
+        showEl(warn);
+        try {
+          const res = await window.api?.canUploadGroup(c.robloxCookie, sel, c.apiKey);
+          if (!res?.canUpload) {
+            warn.textContent = res?.reason || 'No upload permission';
+            return;
+          }
+          hideEl(warn);
+        } catch {
+          hideEl(warn);
+        }
+      });
+
+      document.querySelectorAll('.nav').forEach(btn => {
+        btn.className =
+          'nav w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors text-left';
+        btn.addEventListener('click', () => {
+          document
+            .querySelectorAll('.nav')
+            .forEach(b => b.classList.remove('bg-brandDim', 'text-brand'));
+          document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+          btn.classList.add('bg-brandDim', 'text-brand');
+          const pg = $('page' + btn.dataset.p[0].toUpperCase() + btn.dataset.p.slice(1));
+          if (pg) pg.classList.add('on');
+          if (btn.dataset.p === 'settings') refreshPlugin();
+        });
+      });
+      document.querySelector('.nav[data-p="home"]').classList.add('bg-brandDim', 'text-brand');
+
+      function appendLog(raw) {
+        const el = $('liveLog');
+        if (el.querySelector('span.text-gray-600')) el.innerHTML = '';
+        const span = document.createElement('span');
+        const p = raw.split(':'),
+          t = p[0];
+        const map = {
+          FOUND: ['text-blue-400', `⌕ Found ${p[1]} — ${p.slice(2).join(':')}`],
+          DL: ['text-violet-400', `↓ ${p[1]} — ${p.slice(2).join(':')}`],
+          UL: ['text-amber-500', `↑ ${p[1]} — ${p.slice(2).join(':')}`],
+          OK: ['text-green-500', `✓ ${p[1]} → ${p[2]}  — ${p.slice(3).join(':')}`],
+          OK_DL: ['text-green-500', `✓ ${p[1]} — saved`],
+          FAIL_DL: ['text-red-500', `✗ ${p[1]} — download failed: ${p.slice(3).join(':')}`],
+          FAIL_UL: [
+            'text-red-500',
+            `✗ ${p[1]} — upload failed${p[3] ? ': ' + p.slice(3).join(':') : ''}`,
+          ],
+          OWN: ['text-gray-400', `◈ ${p[1]} — already yours`],
+          SKIP: ['text-gray-400', `□ ${p[1]} — already spoofed`],
+          CACHED: ['text-gray-400', `⚡ ${p[1]} → ${p[2]} (cached)`],
+          WARN: ['text-orange-500', `⚠ ${p.slice(1).join(':')}`],
+          INFO: ['text-slate-400', `→ ${p.slice(1).join(':')}`],
+          ERR: ['text-red-500 font-semibold', `✗ ${p.slice(1).join(':')}`],
         };
-        const sorted = [...items].sort(
-          (a, b) =>
-            (({ processing: 0, cooldown: 1, queued: 2, error: 3, completed: 4 })[
-              a.status ?? 'queued'
-            ] ?? 9) -
-            ({ processing: 0, cooldown: 1, queued: 2, error: 3, completed: 4 }[
-              b.status ?? 'queued'
-            ] ?? 9)
-        );
-        list.innerHTML =
-          sorted
-            .slice(0, 100)
-            .map(item => {
-              const s = item.status || 'queued',
-                cls = sCls[s] || sCls.queued;
-              const p = Math.max(0, Math.min(100, Number(item.progress || 0)));
-              const id = item.originalAssetId || item.assetId || item.id || '';
-              const cool = item.cooldownRemaining ? ` · ${item.cooldownRemaining}s` : '';
-              return `<div class="px-3 py-2 border ${cls}"><div class="flex items-center justify-between mb-1.5"><div class="min-w-0"><div class="text-[12px] font-medium truncate">${esc(item.name || id || 'Asset')}</div><div class="text-[11px] opacity-60 truncate">${esc(item.direction || 'asset')}${id ? ` · ${esc(id)}` : ''}${item.message ? ` · ${esc(item.message)}` : ''}</div></div><span class="text-[11px] font-semibold px-2 py-0.5 bg-white/70 capitalize whitespace-nowrap ml-2">${esc(s)}${cool}</span></div><div class="h-0.5 bg-black/5 overflow-hidden"><div class="h-full bg-current transition-all duration-300" style="width:${p}%"></div></div></div>`;
-            })
-            .join('') +
-          (sorted.length > 100
-            ? `<div class="text-center text-[11px] text-gray-400 py-2">+${sorted.length - 100} more</div>`
-            : '');
+        if (t === 'SUMMARY') {
+          const done = +p[1],
+            fail = +p[2],
+            tot = +p[3];
+          span.className =
+            fail > 0 ? 'text-orange-500 font-semibold' : 'text-green-500 font-semibold';
+          span.textContent = `\nDone — ${done}/${tot}${fail > 0 ? `, ${fail} failed` : ''}`;
+        } else if (map[t]) {
+          span.className = map[t][0];
+          span.textContent = map[t][1];
+        } else {
+          span.className = 'text-slate-400';
+          span.textContent = raw;
+        }
+        if (el.childNodes.length > 0) el.appendChild(document.createTextNode('\n'));
+        el.appendChild(span);
+        el.scrollTop = el.scrollHeight;
       }
 
-      function resetRunReport() {
-        $id('run-report-mode').textContent = 'No run yet';
-        $id('run-report-grid').innerHTML = '';
-        $id('run-report-failures').innerHTML = '';
-      }
-      function renderRunReport(s) {
-        if (!s) return;
-        $id('run-report-mode').textContent =
-          `${s.mode || (s.downloadOnly ? 'Download only' : 'Download + Upload')} · ${s.durationSeconds || 0}s`;
-        const ut = Math.max(0, (s.total ?? 0) - (s.downloadFailures ?? 0));
-        const cards = [
-          ['Total', s.total ?? 0],
-          ['Downloaded', `${s.downloaded ?? 0}/${s.total ?? 0}`],
-          ['Uploaded', s.downloadOnly ? '—' : `${s.uploaded ?? 0}/${ut}`],
-          ['Failures', (s.downloadFailures || 0) + (s.uploadFailures || 0)],
-          ['Cached', s.cached || 0],
-          ['Skipped', s.skippedUploads || 0],
-        ];
-        const cls = (l, v) => {
-          const t = l.toLowerCase(),
-            n = Number(String(v).split('/')[0]);
-          return t.includes('fail') && n > 0
-            ? 'bg-red-50 border-red-100 text-red-700'
-            : t.includes('skip') && n > 0
-              ? 'bg-amber-50 border-amber-100 text-amber-700'
-              : t.includes('down') || t.includes('up') || t.includes('cache')
-                ? 'bg-green-50 border-green-100 text-green-700'
-                : 'bg-gray-50 border-gray-100 text-gray-700';
-        };
-        $id('run-report-grid').innerHTML = cards
-          .map(
-            ([l, v]) =>
-              `<div class="p-2.5 border ${cls(l, v)}"><span class="block text-[10px] uppercase tracking-wider opacity-60 mb-0.5">${esc(l)}</span><strong class="block text-[16px]">${esc(String(v))}</strong></div>`
-          )
-          .join('');
-        const fails = Array.isArray(s.failures) ? s.failures : [];
-        const cats = s.failureCategories || {};
-        if (!fails.length && !Object.keys(cats).length) {
-          $id('run-report-failures').innerHTML =
-            '<div class="text-center text-[12px] text-green-600 py-4 bg-green-50 border border-green-100 mt-3">No failures.</div>';
+      let running = false,
+        paused = false;
+
+      $('btnRun').addEventListener('click', () => {
+        if (running) return;
+        const c = getCreds();
+        if (!c.robloxCookie) {
+          showLogin();
           return;
         }
-        const catHtml = Object.keys(cats).length
-          ? `<div class="flex flex-wrap gap-1.5 mt-3 mb-2">${Object.entries(cats)
-              .map(
-                ([k, v]) =>
-                  `<span class="px-2 py-0.5 bg-gray-100 text-[11px] text-gray-600">${esc(k)} · ${v}</span>`
-              )
-              .join('')}</div>`
-          : '';
-        const failHtml = fails.length
-          ? `<div class="space-y-1.5">${fails
-              .slice(0, 20)
-              .map(
-                f =>
-                  `<div class="px-3 py-2 bg-red-50 border border-red-100 text-[11px] text-red-700"><strong>${esc(f.id || '?')}</strong> — ${esc(f.reason || f.error || 'Unknown')}</div>`
-              )
-              .join(
-                ''
-              )}${fails.length > 20 ? `<div class="text-[11px] text-gray-400 text-center py-1">+${fails.length - 20} more</div>` : ''}</div>`
-          : '';
-        $id('run-report-failures').innerHTML = catHtml + failHtml;
-      }
-
-      let _paused = false;
-      let studioConnected = false;
-
-      $id('copy-output-btn').addEventListener('click', () => {
-        const t = $id('output-data').value;
-        if (!t) return;
-        navigator.clipboard.writeText(t);
-        updateStatus('Copied to clipboard');
-      });
-      $id('minimize-btn').addEventListener('click', () => window.electronAPI?.minimize());
-      $id('close-btn').addEventListener('click', () => window.electronAPI?.close());
-      $id('uninstall-btn').addEventListener('click', () => {
-        $id('uninstall-modal').classList.remove('hidden');
-        $id('uninstall-modal').classList.add('flex');
-      });
-      $id('cancel-uninstall-btn').addEventListener('click', () => {
-        $id('uninstall-modal').classList.add('hidden');
-        $id('uninstall-modal').classList.remove('flex');
-      });
-      $id('confirm-uninstall-btn').addEventListener(
-        'click',
-        async () => await window.electronAPI?.uninstallApp()
-      );
-      $id('select-folder-btn').addEventListener('click', async () => {
-        const p = await window.electronAPI?.selectFolder();
-        if (p) $id('downloadFolder').value = p;
-      });
-      $id('default-folder-browse-btn').addEventListener('click', async () => {
-        const p = await window.electronAPI?.selectFolder();
-        if (p) {
-          $id('default-output-folder').value = p;
-          saveSettings({ defaultOutputFolder: p });
-        }
-      });
-      $id('get-open-cloud-key-btn').addEventListener('click', () =>
-        window.electronAPI?.openExternal('https://create.roblox.com/dashboard/credentials')
-      );
-      $id('clear-history-btn').addEventListener('click', async () => {
-        if (!confirm('Clear all history and cached mappings?')) return;
-        await window.electronAPI?.clearAppHistory();
-        await window.electronAPI?.clearRunsHistory();
-        resetRunReport();
-        resetQueue();
-        await refreshRunsDropdown();
-        updateStatus('History cleared');
-      });
-      $id('reset-settings-btn').addEventListener('click', () => {
-        if (!confirm('Reset all settings to defaults?')) return;
-        localStorage.removeItem(SETTINGS_KEY);
-        applySettings(DEFAULT_SETTINGS);
-        updateStatus('Settings reset');
-      });
-      $id('open-plugins-folder-btn').addEventListener('click', () =>
-        window.electronAPI?.openPluginsFolder()
-      );
-
-      async function doInstallPlugin() {
-        const btn = $id('install-plugin-btn');
-        const banner = $id('plugin-status-banner');
-        btn.disabled = true;
-        btn.innerHTML = 'Installing...';
-        banner.classList.add('hidden');
-        const result = await window.electronAPI?.installPlugin();
-        btn.disabled = false;
-        await updatePluginButton();
-        lucide.createIcons();
-        banner.className = result?.ok
-          ? 'mb-3 px-3 py-2 border text-[12px] font-medium bg-green-50 border-green-200 text-green-700'
-          : 'mb-3 px-3 py-2 border text-[12px] font-medium bg-red-50 border-red-200 text-red-700';
-        banner.textContent = result?.ok
-          ? 'Plugin installed successfully.'
-          : result?.error || 'Failed to install plugin.';
-        banner.classList.remove('hidden');
-      }
-      $id('install-plugin-btn').addEventListener('click', doInstallPlugin);
-      $id('update-plugin-btn').addEventListener('click', doInstallPlugin);
-
-      $id('pause-spoofer-btn').addEventListener('click', () => {
-        _paused = true;
-        $id('pause-spoofer-btn').classList.add('hidden');
-        $id('run-spoofer-btn').classList.remove('hidden');
-        window.electronAPI?.pauseSpoofer();
-        updateStatus('Paused');
-      });
-
-      $id('run-spoofer-btn').addEventListener('click', () => {
-        if (_paused) {
-          _paused = false;
-          window.electronAPI?.resumeSpoofer();
-          $id('run-spoofer-btn').classList.add('hidden');
-          $id('pause-spoofer-btn').classList.remove('hidden');
-          updateStatus('Resuming...');
-          return;
-        }
-        const s = readSettings();
-        window.electronAPI?.runSpooferAction({
-          animationId: $id('animationId').value,
-          robloxCookie: $id('robloxCookie').value,
-          apiKey: $id('openCloudApiKey').value,
-          groupId: $id('groupId').value,
+        running = true;
+        $('liveLog').innerHTML = '';
+        setProgress(0);
+        progressTotal = 0;
+        hideEl($('btnRun'));
+        showEl($('btnPause'));
+        showEl($('btnStop'));
+        setStatus('Running...');
+        const s = readS();
+        window.api?.runSpoofer({
+          robloxCookie: c.robloxCookie,
+          apiKey: c.apiKey,
+          groupId: $('groupId').value,
           downloadOnly: s.downloadOnly,
-          downloadFolder: $id('downloadFolder').value || s.defaultOutputFolder,
+          downloadFolder: $('downloadFolder').value,
           enableSpoofing: s.enableSpoofing,
           spoofSounds: false,
-          autoSaveSession: s.autoSaveSessions,
-          maxPlaceIds: parseInt($id('maxPlaceIds').value, 10),
-          maxPlaceIdRetries: parseInt($id('maxPlaceIdRetries').value, 10),
-          uploadRetries: parseInt($id('uploadRetries').value, 10),
-          uploadRetryDelay: parseInt($id('uploadRetryDelay').value, 10),
-          overridePlaceId: $id('overridePlaceId').value,
+          maxPlaceIds: +$('maxPlaceIds').value || 10,
+          maxPlaceIdRetries: +$('maxPlaceIdRetries').value || 3,
+          uploadRetries: +$('uploadRetries').value || 3,
+          uploadRetryDelay: +$('uploadRetryDelay').value || 5000,
+          overridePlaceId: $('overridePlaceId').value,
           uploadConcurrency: s.uploadConcurrency,
           downloadConcurrency: s.downloadConcurrency,
         });
-        $id('run-spoofer-btn').classList.add('hidden');
-        $id('pause-spoofer-btn').classList.remove('hidden');
-        updateStatus('Starting...');
       });
 
-      $id('scan-btn').addEventListener('click', async () => {
-        if (!studioConnected) {
-          updateStatus('Studio not connected');
-          return;
-        }
-        $id('scan-status-badge').classList.remove('hidden');
-        updateStatus('Requesting scan...');
-        try {
-          const r = await fetch('http://127.0.0.1:28476/request-scan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ assetType: 'Animation' }),
-          });
-          updateStatus(r.ok ? 'Scan request sent' : 'Failed to send scan request');
-        } catch {
-          updateStatus('Failed to send scan request');
-        }
-      });
-
-      $id('send-replace-btn').addEventListener('click', async () => {
-        const mappings = $id('output-data').value.trim();
-        if (!mappings) {
-          updateStatus('No mappings to send');
-          return;
-        }
-        const mappingLines = mappings
-          .split('\n')
-          .map(l => l.trim())
-          .filter(Boolean);
-        if (!mappingLines.length) {
-          updateStatus('No valid mappings to send');
-          return;
-        }
-        const conn = await window.electronAPI?.getStudioConnection();
-        if (!conn?.connected) {
-          updateStatus('Studio not connected');
-          return;
-        }
-        $id('send-replace-btn').disabled = true;
-        updateStatus('Replacing in Studio...');
-        try {
-          const r = await fetch('http://127.0.0.1:28476/set-mappings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mappings: mappingLines }),
-          });
-          if (!r.ok) {
-            updateStatus('Failed to send mappings');
-            $id('send-replace-btn').disabled = false;
-          }
-        } catch {
-          updateStatus('Failed to send mappings');
-          $id('send-replace-btn').disabled = false;
-        }
-      });
-
-      window.electronAPI?.onStatusUpdate(msg => updateStatus(msg));
-      window.electronAPI?.onTransferUpdate(u => upsertQueueItem(u));
-      window.electronAPI?.onSpooferResult(result => {
-        if (result.output) $id('output-data').value = result.output;
-        if (result.failedAnimationIdInput) lastFailedInput = result.failedAnimationIdInput;
-        if (result.summary) renderRunReport(result.summary);
-        $id('run-spoofer-btn').classList.remove('hidden');
-        $id('pause-spoofer-btn').classList.add('hidden');
-        _paused = false;
-        updateStatus(result.success ? 'Complete' : 'Failed');
-        refreshRunsDropdown();
-      });
-
-      window.electronAPI?.onStudioStatusUpdate(({ status, connection }) => {
-        studioConnected = status === 'connected';
-        const banner = $id('studio-banner');
-        banner.classList.toggle('hidden', !studioConnected);
-        if (studioConnected) {
-          $id('studio-place-name').textContent = connection?.placeName || 'Unknown';
-          $id('studio-status-dot').style.background = '#22c55e';
+      $('btnPause').addEventListener('click', () => {
+        paused = !paused;
+        if (paused) {
+          window.api?.pauseSpoofer();
+          $('btnPause').innerHTML = '<i data-lucide="play" class="w-3.5 h-3.5"></i>';
+          setStatus('Paused');
         } else {
-          $id('studio-status-dot').style.background = '#ef4444';
+          window.api?.resumeSpoofer();
+          $('btnPause').innerHTML = '<i data-lucide="pause" class="w-3.5 h-3.5"></i>';
+          setStatus('Resuming...');
         }
-        $id('scan-btn').disabled = !studioConnected;
-        $id('run-spoofer-btn').disabled = !studioConnected;
-        $id('send-replace-btn').disabled = !studioConnected;
+        lucide.createIcons();
       });
+      $('btnStop').addEventListener('click', () => window.api?.pauseSpoofer());
 
-      window.electronAPI?.onStudioScanResult(data => {
-        if (data.status === 'scanning') {
-          if (data.isStart) {
-            $id('animationId').value = '';
-            $id('scan-progress-card').classList.remove('hidden');
-            $id('scan-status-badge').classList.remove('hidden');
-            $id('scan-status-badge').textContent = 'Scanning...';
-          }
-          const pct = data.progress || 0;
-          $id('scan-progress-bar').style.width = pct + '%';
-          $id('scan-progress-pct').textContent = pct + '%';
-          const count = data.results?.length || 0;
-          $id('scan-progress-found').textContent =
-            `Found ${count} animation${count !== 1 ? 's' : ''} so far...`;
-          if (count > 0) $id('animationId').value = data.results.join('\n');
-          return;
+      window.api?.on('log-line', appendLog);
+      window.api?.on('progress', ({ done, failed }) => {
+        const total = done + failed;
+        if (!progressTotal || progressTotal < total) progressTotal = total;
+        const pct = progressTotal > 0 ? Math.round((done / progressTotal) * 100) : 0;
+        setProgress(pct, `${done}/${progressTotal}${failed > 0 ? ' · ' + failed + ' ✗' : ''}`);
+      });
+      window.api?.on('status', setStatus);
+      window.api?.on('result', ({ ok, totalDone: d, totalFailed: f }) => {
+        running = false;
+        paused = false;
+        showEl($('btnRun'));
+        hideEl($('btnPause'));
+        hideEl($('btnStop'));
+        $('btnPause').innerHTML = '<i data-lucide="pause" class="w-3.5 h-3.5"></i>';
+        lucide.createIcons();
+        if (ok) setProgress(100);
+        setStatus(ok ? `Done — ${d} done${f > 0 ? `, ${f} failed` : ''}` : 'Failed');
+      });
+      window.api?.on('studio-status-update', ({ status, connection }) => {
+        const on = status === 'connected';
+        $('studioBanner').classList.toggle('hidden', !on);
+        if (on) {
+          $('studioPlace').textContent = connection?.placeName || 'Unknown';
+          $('studioDot').style.background = '#22c55e';
         }
-        $id('scan-status-badge').classList.add('hidden');
-        $id('scan-progress-card').classList.add('hidden');
-        if (!data.results?.length) {
-          updateStatus('No animations found');
-          return;
-        }
-        $id('animationId').value = data.results.join('\n');
-        updateStatus(
-          `Scan complete — ${data.results.length} animation${data.results.length !== 1 ? 's' : ''} found`
-        );
       });
 
-      window.electronAPI?.onStudioReplaceComplete(data => {
-        $id('send-replace-btn').disabled = false;
-        updateStatus(
-          data?.success
-            ? `Replaced ${data.replacedCount || 0} instances in Studio (${(data.elapsed || 0).toFixed(1)}s)`
-            : 'Replace failed in Studio'
-        );
-      });
-
-      async function refreshRunsDropdown() {
-        const sel = $id('history-runs-dropdown');
-        if (!sel) return;
-        const loadBtn = $id('load-session-btn');
-        const delBtn = $id('delete-session-btn');
-        const runs = (await window.electronAPI?.getRunsHistory()) || [];
-        if (!runs.length) {
-          sel.innerHTML = '<option value="">— no saved sessions —</option>';
-          loadBtn.disabled = true;
-          delBtn.disabled = true;
-          return;
-        }
-        const prev = sel.value;
-        sel.innerHTML =
-          '<option value="">— select a session —</option>' +
-          runs
-            .map(r => {
-              const d = new Date(r.startedAt);
-              const dt = d.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              });
-              const count = r.transfers?.length || 0;
-              const icon = r.status === 'complete' ? '✓' : r.status === 'failed' ? '✗' : '◌';
-              return `<option value="${esc(r.id)}">${icon} ${dt} — ${count} asset${count !== 1 ? 's' : ''} · ${esc(r.status || 'active')}</option>`;
-            })
-            .join('');
-        if (prev && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
-        const hasVal = !!sel.value;
-        loadBtn.disabled = !hasVal;
-        delBtn.disabled = !hasVal;
-      }
-
-      $id('history-runs-dropdown').addEventListener('change', () => {
-        const hasVal = !!$id('history-runs-dropdown').value;
-        $id('load-session-btn').disabled = !hasVal;
-        $id('delete-session-btn').disabled = !hasVal;
-      });
-
-      $id('refresh-sessions-btn').addEventListener('click', refreshRunsDropdown);
-
-      $id('load-session-btn').addEventListener('click', async () => {
-        const id = $id('history-runs-dropdown').value;
-        if (!id) return;
-        const runs = (await window.electronAPI?.getRunsHistory()) || [];
-        const run = runs.find(r => r.id === id);
-        if (!run) return;
-        resetQueue();
-        (run.transfers || []).forEach(t => upsertQueueItem(t));
-        if (run.summary) renderRunReport(run.summary);
-        if (run.output) $id('output-data').value = run.output;
-        updateStatus(
-          `Session loaded — ${run.transfers?.length || 0} transfer${(run.transfers?.length || 0) !== 1 ? 's' : ''}`
-        );
-      });
-
-      $id('delete-session-btn').addEventListener('click', async () => {
-        const id = $id('history-runs-dropdown').value;
-        if (!id) return;
-        await window.electronAPI?.deleteRun(id);
-        await refreshRunsDropdown();
-        updateStatus('Session deleted');
-      });
-
-      async function updatePluginButton(hasPluginUpdate) {
-        const status = await window.electronAPI?.getPluginStatus();
-        const btn = $id('install-plugin-btn');
-        const updateBtn = $id('update-plugin-btn');
-        const pathRow = $id('plugin-path-row');
-        const pathText = $id('plugin-path-text');
-        if (status?.installed) {
+      async function refreshPlugin() {
+        const [s, u] = await Promise.all([
+          window.api?.pluginStatus(),
+          window.api?.pluginUpdateStatus?.(),
+        ]);
+        const btn = $('btnInstallPlugin'),
+          btnU = $('btnUpdatePlugin'),
+          row = $('pluginStatusRow'),
+          ubanner = $('pluginUpdateBanner');
+        if (s?.installed) {
           btn.innerHTML = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reinstall Plugin';
-          if (status.file) {
-            pathText.textContent = status.file;
-            pathRow.classList.remove('hidden');
+          if (s.file) {
+            $('pluginPathText').textContent = s.file;
+            const ver = s.file.match(/v([\d.]+)/i)?.[1];
+            $('pluginVersionBadge').textContent = ver ? 'v' + ver : '';
+            showEl(row);
           }
-          if (hasPluginUpdate) updateBtn.classList.remove('hidden');
-          else updateBtn.classList.add('hidden');
         } else {
           btn.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i> Install Plugin';
-          pathRow.classList.add('hidden');
-          updateBtn.classList.add('hidden');
+          hideEl(row);
+        }
+        if (u?.hasUpdate) {
+          $('pluginUpdateText').textContent =
+            `Update — v${u.installedVersion || 'none'} → v${u.distVersion}`;
+          showEl(ubanner);
+          showEl(btnU);
+        } else {
+          hideEl(ubanner);
+          hideEl(btnU);
         }
         lucide.createIcons();
       }
 
-      $id('update-btn').addEventListener('click', async () => {
-        const btn = $id('update-btn');
+      async function doInstall(btn) {
         btn.disabled = true;
-        btn.innerHTML = '<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> Checking...';
-        lucide.createIcons();
-        updateStatus('Checking for updates...');
-        const res = await window.electronAPI?.checkForUpdates();
+        btn.textContent = 'Installing...';
+        const r = await window.api?.installPlugin();
         btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="arrow-up-circle" class="w-3.5 h-3.5"></i> Update';
-        lucide.createIcons();
-        if (!res) {
-          updateStatus('Update check failed');
-          return;
-        }
-        if (res.error) {
-          updateStatus('Update check failed');
-          return;
-        }
-        if (res.upToDate) {
-          updateStatus(`Up to date (${res.current})`);
-          return;
-        }
-        const ok = confirm(
-          `New version available: ${res.latest}\nCurrent: ${res.current}\n\nOpen the releases page to download?`
-        );
-        if (ok) window.electronAPI?.openExternal(res.releaseUrl);
+        await refreshPlugin();
+        const b = $('pluginBanner');
+        b.className = r?.ok
+          ? 'mb-3 px-3 py-2 border text-[11px] font-medium bg-green-50 border-green-200 text-green-700'
+          : 'mb-3 px-3 py-2 border text-[11px] font-medium bg-red-50 border-red-200 text-red-600';
+        b.textContent = r?.ok ? 'Plugin installed.' : r?.error || 'Install failed.';
+        showEl(b);
+        setStatus(r?.ok ? 'Plugin installed' : 'Install failed');
+      }
+      $('btnInstallPlugin').addEventListener('click', () => doInstall($('btnInstallPlugin')));
+      $('btnUpdatePlugin').addEventListener('click', () => doInstall($('btnUpdatePlugin')));
+      $('btnOpenPluginsFolder').addEventListener('click', () => window.api?.openPluginsFolder());
+
+      $('btnMin').addEventListener('click', () => window.api?.minimize());
+      $('btnClose').addEventListener('click', () => window.api?.close());
+
+      $('btnUninstall').addEventListener('click', () => showM('Uninstall'));
+      $('btnCancelUninstall').addEventListener('click', () => hideM('Uninstall'));
+      $('btnConfirmUninstall').addEventListener('click', () => window.api?.uninstall());
+
+      $('btnClearHistory').addEventListener('click', async () => {
+        if (!confirm('Clear all history?')) return;
+        await window.api?.clearHistory();
+        setStatus('History cleared');
+      });
+      $('btnResetSettings').addEventListener('click', () => {
+        if (!confirm('Reset settings?')) return;
+        localStorage.removeItem(SK);
+        applySettings();
+        setStatus('Settings reset');
       });
 
-      window.electronAPI?.getAppVersion().then(v => {
-        $id('version-text').textContent = 'v' + v;
+      $('btnUpdate').addEventListener('click', async () => {
+        $('btnUpdate').disabled = true;
+        setStatus('Checking...');
+        const r = await window.api?.fetchUpdateInfo();
+        $('btnUpdate').disabled = false;
+        if (!r || r.error) {
+          setStatus('Update check failed');
+          return;
+        }
+        if (!r.hasUpdate) {
+          setStatus(`Up to date (v${r.current})`);
+          return;
+        }
+        $('updateTitle').textContent = `Update ${r.latest}`;
+        $('updateSubtitle').textContent = `Current: v${r.current}`;
+        $('updateBar').style.width = '0%';
+        $('updatePct').textContent = '0%';
+        showEl($('modalUpdate'));
+        $('modalUpdate').classList.add('flex');
+        showEl($('updateActions'));
+        hideEl($('btnInstallUpdate'));
+      });
+
+      $('btnCancelUpdate').addEventListener('click', () => {
+        hideEl($('modalUpdate'));
+        $('modalUpdate').classList.remove('flex');
+      });
+
+      $('btnDownloadUpdate').addEventListener('click', async () => {
+        hideEl($('updateActions'));
+        $('updateSubtitle').textContent = 'Downloading...';
+        window.api?.downloadUpdate();
+      });
+
+      $('btnInstallUpdate').addEventListener('click', async () => {
+        await window.api?.applyUpdate();
+      });
+
+      window.api?.onUpdateProgress(({ pct }) => {
+        $('updateBar').style.width = pct + '%';
+        $('updatePct').textContent = pct + '%';
+        $('updateSubtitle').textContent = 'Downloading...';
+      });
+
+      window.api?.onUpdateDone(({ ok, error }) => {
+        if (!ok) {
+          $('updateSubtitle').textContent = error || 'Download failed';
+          showEl($('updateActions'));
+          return;
+        }
+        $('updateSubtitle').textContent = 'Download complete';
+        $('updateBar').style.width = '100%';
+        $('updatePct').textContent = '100%';
+        hideEl($('updateActions'));
+        showEl($('btnInstallUpdate'));
+      });
+
+      $('btnProfile').addEventListener('click', () => {
+        if (!cachedUser) return;
+        const c = getCreds();
+        if (cachedUser.avatarUrl) $('profileAvatar').src = cachedUser.avatarUrl;
+        $('profileName').textContent = cachedUser.displayName || cachedUser.name;
+        $('profileUser').textContent = '@' + cachedUser.name;
+        $('profileId').textContent = cachedUser.id ? 'ID: ' + cachedUser.id : '';
+        $('profileCookieStatus').textContent = c.robloxCookie ? 'Set' : 'Missing';
+        $('profileCookieStatus').className =
+          'font-semibold ' + (c.robloxCookie ? 'text-ok' : 'text-danger');
+        $('profileApiStatus').textContent = c.apiKey ? 'Set' : 'Missing';
+        $('profileApiStatus').className = 'font-semibold ' + (c.apiKey ? 'text-ok' : 'text-danger');
+        showM('Profile');
+      });
+      $('btnCloseProfile').addEventListener('click', () => hideM('Profile'));
+
+      $('btnEditCreds').addEventListener('click', () => {
+        const c = getCreds();
+        $('editCookie').value = c.robloxCookie || '';
+        $('editApiKey').value = c.apiKey || '';
+        hideEl($('editCredsError'));
+        hideM('Profile');
+        showM('Creds');
+      });
+      $('btnCancelEditCreds').addEventListener('click', () => hideM('Creds'));
+
+      $('btnSaveCreds').addEventListener('click', async () => {
+        const cookie = $('editCookie').value.trim(),
+          apiKey = $('editApiKey').value.trim(),
+          e = $('editCredsError');
+        if (!cookie) {
+          e.textContent = 'Cookie is required';
+          showEl(e);
+          return;
+        }
+        $('btnSaveCreds').disabled = true;
+        $('btnSaveCreds').textContent = 'Verifying...';
+        const info = await window.api?.fetchUserInfo(cookie);
+        $('btnSaveCreds').disabled = false;
+        $('btnSaveCreds').textContent = 'Save';
+        if (!info || info.error) {
+          e.textContent = 'Invalid cookie';
+          showEl(e);
+          return;
+        }
+        saveCreds(cookie, apiKey);
+        hideM('Creds');
+        await refreshAccount();
+        await refreshGroups();
+        setStatus('Credentials updated');
+      });
+
+      $('btnSignOut').addEventListener('click', () => {
+        if (!confirm('Sign out?')) return;
+        localStorage.removeItem(CK);
+        cachedUser = null;
+        hideM('Profile');
+        $('btnProfile').style.display = 'none';
+        showEl($('btnShowLogin'));
+        setStatus('Signed out');
+      });
+
+      function showLogin() {
+        $('loginCookie').value = '';
+        $('loginApiKey').value = '';
+        hideEl($('loginError'));
+        $('loginStatus').textContent = '';
+        showEl($('loginScreen'));
+        $('loginScreen').classList.add('flex');
+      }
+      function hideLogin() {
+        hideEl($('loginScreen'));
+        $('loginScreen').classList.remove('flex');
+      }
+
+      $('btnShowLogin').addEventListener('click', showLogin);
+      $('btnLoginGetKey').addEventListener('click', () =>
+        window.api?.openExternal('https://create.roblox.com/dashboard/credentials')
+      );
+
+      $('btnLogin').addEventListener('click', async () => {
+        const cookie = $('loginCookie').value.trim(),
+          apiKey = $('loginApiKey').value.trim(),
+          e = $('loginError');
+        hideEl(e);
+        if (!cookie) {
+          e.textContent = 'Cookie is required';
+          showEl(e);
+          return;
+        }
+        if (!apiKey) {
+          e.textContent = 'API key is required';
+          showEl(e);
+          return;
+        }
+        $('btnLogin').disabled = true;
+        $('loginStatus').textContent = 'Verifying cookie...';
+        const info = await window.api?.fetchUserInfo(cookie);
+        if (!info || info.error) {
+          $('btnLogin').disabled = false;
+          $('loginStatus').textContent = '';
+          e.textContent = 'Invalid cookie — authentication failed';
+          showEl(e);
+          return;
+        }
+        $('loginStatus').textContent = 'Verifying API key...';
+        const kc = await window.api?.canUploadGroup(cookie, null, apiKey).catch(() => null);
+        $('btnLogin').disabled = false;
+        $('loginStatus').textContent = '';
+        if (kc && kc.canUpload === false && /invalid|unauthorized|401|403/i.test(kc.reason || '')) {
+          e.textContent = 'Invalid API key — check permissions';
+          showEl(e);
+          return;
+        }
+        saveCreds(cookie, apiKey);
+        wj(OK, '1');
+        hideLogin();
+        await refreshAccount();
+        await refreshGroups();
+        setStatus(`Welcome, ${info.displayName || info.name}!`);
       });
 
       (async () => {
         applySettings();
-        loadCredentials();
-        await refreshAccountInfo();
-        await refreshGroupDropdown();
-        await updatePluginButton();
-        await refreshRunsDropdown();
-        updateStatus('Ready');
-        const upd = await window.electronAPI?.checkForUpdates();
-        if (upd && !upd.error && !upd.upToDate) {
-          const btn = $id('update-btn');
-          btn.classList.remove('text-gray-500');
-          btn.classList.add('text-brand');
-          await updatePluginButton(true);
-          updateStatus(`Update available: ${upd.latest}`);
+        window.api?.appVersion().then(v => {
+          $('versionText').textContent = 'Jonuffy Spoofer v' + v;
+        });
+        const c = getCreds();
+        if (!c.robloxCookie || !rj(OK, null)) {
+          showLogin();
+        } else {
+          await refreshAccount();
+          await refreshGroups();
+          await refreshPlugin();
         }
+        setStatus('Ready');
+        const upd = await window.api?.checkUpdates();
+        if (upd && !upd.error && !upd.upToDate) setStatus(`Update available: ${upd.latest}`);
       })();
     </script>
   </body>

@@ -5,33 +5,23 @@ const { setupAppLifecycle, getMainWindow } = require('./modules/window');
 const { registerIpcHandlers } = require('./modules/handler');
 const { startServer, setStudioCallbacks } = require('./modules/connect');
 
-function sendToRenderer(channel, payload) {
+const send = (channel, payload) => {
   const win = getMainWindow();
-  if (!win || win.isDestroyed()) return;
-  win.webContents?.send(channel, payload);
-}
+  if (win && !win.isDestroyed()) win.webContents?.send(channel, payload);
+};
 
-const sendStatusMessage = msg => sendToRenderer('update-status-message', msg);
-const sendTransferUpdate = payload => sendToRenderer('transfer-update', payload);
-const sendSpooferResult = result => sendToRenderer('spoofer-result', result);
+const emit = (event, payload) => send(event, payload);
 
-registerIpcHandlers(getMainWindow, sendTransferUpdate, sendSpooferResult, sendStatusMessage);
+registerIpcHandlers(getMainWindow, emit);
 
 setStudioCallbacks({
-  onScanResult: data => sendToRenderer('studio-scan-result', data),
-  onReplaceComplete: data => {
-    global.currentMappings = [];
-    sendToRenderer('studio-replace-complete', data);
-  },
-  onStatusUpdate: (status, connection) =>
-    sendToRenderer('studio-status-update', { status, connection }),
-  onScanRequest: data => {
-    global.pendingScanRequest = data;
-  },
+  onScanResult: data => send('studio-scan-result', data),
+  onReplaceComplete: data => send('studio-replace-complete', data),
+  onStatusUpdate: (status, connection) => send('studio-status-update', { status, connection }),
 });
 
 setupAppLifecycle();
 app.whenReady().then(startServer);
 
-process.on('uncaughtException', err => sendStatusMessage(err?.message ?? String(err)));
-process.on('unhandledRejection', err => sendStatusMessage(err?.message ?? String(err)));
+process.on('uncaughtException', err => emit('status', err?.message ?? String(err)));
+process.on('unhandledRejection', err => emit('status', err?.message ?? String(err)));
