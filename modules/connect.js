@@ -9,6 +9,8 @@ let callbacks = {};
 let pendingMappings = null;
 let pendingScanReq = null;
 let scanHandler = null;
+let studioSocket = null;
+let isScanning = false;
 
 const setStudioCallbacks = cb => {
   callbacks = cb;
@@ -54,6 +56,14 @@ async function handleRequest(req, res) {
       placeName: body.placeName,
       connectedAt: Date.now(),
     };
+    studioSocket = req.socket;
+    studioSocket.on('close', () => {
+      if (studioConn) {
+        studioConn = null;
+        studioSocket = null;
+        callbacks.onStatusUpdate?.('disconnected', null);
+      }
+    });
     callbacks.onStatusUpdate?.('connected', studioConn);
     return reply(res, 200, { ok: true });
   }
@@ -65,6 +75,7 @@ async function handleRequest(req, res) {
   }
 
   if (url === '/poll' && req.method === 'GET') {
+    lastHeartbeat = Date.now();
     const resp = {};
     if (pendingScanReq) {
       resp.scanRequest = pendingScanReq;
@@ -81,6 +92,9 @@ async function handleRequest(req, res) {
     const body = await parseBody(req);
     callbacks.onScanResult?.(body);
     scanHandler?.(body);
+    if (body.status === 'completed' || body.status === 'cancelled') {
+      isScanning = false;
+    }
     return reply(res, 200, { ok: true });
   }
 
@@ -91,8 +105,17 @@ async function handleRequest(req, res) {
   }
 
   if (url === '/request-scan' && req.method === 'POST') {
+    if (isScanning) return reply(res, 409, { error: 'Scan already in progress' });
     const body = await parseBody(req);
     pendingScanReq = body;
+    isScanning = true;
+    return reply(res, 200, { ok: true });
+  }
+
+  if (url === '/cancel-scan' && req.method === 'POST') {
+    isScanning = false;
+    pendingScanReq = null;
+    scanHandler?.({ status: 'cancelled' });
     return reply(res, 200, { ok: true });
   }
 

@@ -172,6 +172,15 @@ function registerIpcHandlers(getWin, emit) {
 
   ipcMain.on('spoofer-pause', doPause);
   ipcMain.on('spoofer-resume', doResume);
+  ipcMain.on('spoofer-stop', () => {
+    doPause();
+    try {
+      fetch('http://127.0.0.1:28476/cancel-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch {}
+  });
   ipcMain.handle('check-session', loadSession);
   ipcMain.on('clear-session', clearSession);
 
@@ -352,7 +361,7 @@ async function runPipeline(data, emit) {
   const maxPlaceRetries = parseInt(data.maxPlaceIdRetries) || 3;
   const dlOpts = {
     timeoutMs: 30000,
-    retries: parseInt(data.downloadRetries) || 3,
+    retries: 3,
     retryDelayMs: 3000,
   };
   const UL_RETRIES = parseInt(data.uploadRetries) || 3;
@@ -518,6 +527,11 @@ async function runPipeline(data, emit) {
     });
 
     const onScanData = async scanData => {
+      if (scanData.status === 'cancelled') {
+        scanDone = true;
+        resolveQueue?.();
+        return;
+      }
       if (scanData.status === 'scanning' && scanData.results?.length) {
         for (const e of parseAssetInput(scanData.results.join('\n'))) {
           if (!scanQueue.find(x => x.id === e.id)) {
@@ -556,12 +570,9 @@ async function runPipeline(data, emit) {
     await Promise.all([queuePromise, processLoop()]);
     setScanHandler(null);
   } else {
-    if (!data.animationId?.trim()) return fail('No asset IDs provided and Studio not connected.');
-    const entries = parseAssetInput(data.animationId);
-    if (!entries.length) return fail('No valid entries found.');
-    log(`INFO:Processing ${entries.length} assets...`);
-    emit('status', `Processing ${entries.length} assets...`);
-    await runWithConcurrency(entries, dlConcurrency, processEntry);
+    return fail(
+      'Studio not connected. Open Roblox Studio with the plugin to scan assets automatically.'
+    );
   }
 
   if (!data.downloadOnly) {

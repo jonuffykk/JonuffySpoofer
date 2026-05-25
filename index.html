@@ -1208,7 +1208,7 @@
         }
         lucide.createIcons();
       });
-      $('btnStop').addEventListener('click', () => window.api?.pauseSpoofer());
+      $('btnStop').addEventListener('click', () => window.api?.stopSpoofer());
 
       window.api?.on('log-line', appendLog);
       window.api?.on('progress', ({ done, failed }) => {

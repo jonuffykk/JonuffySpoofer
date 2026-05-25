@@ -214,6 +214,17 @@ local function doConnect()
 	return ok
 end
 
+local function tryAutoConnect(maxAttempts)
+	if connected then return true end
+	for i = 1, (maxAttempts or 5) do
+		if doConnect() then
+			return true
+		end
+		task.wait(1)
+	end
+	return false
+end
+
 local function poll()
 	while connected do
 		task.wait(POLL_INTERVAL)
@@ -221,6 +232,10 @@ local function poll()
 		if not ok then
 			connected = false
 			updateUI()
+			if tryAutoConnect(3) then
+				updateUI()
+				task.spawn(poll)
+			end
 			break
 		end
 
@@ -256,4 +271,21 @@ local toolbar = plugin:CreateToolbar("Jonuffy Spoofer")
 local toolBtn = toolbar:CreateButton("Jonuffy Spoofer", "Toggle widget", "rbxassetid://133573191144566")
 toolBtn.Click:Connect(function() widget.Enabled = not widget.Enabled end)
 
+widget:GetPropertyChangedSignal("Enabled"):Connect(function()
+	if widget.Enabled and not connected then
+		task.spawn(function()
+			if tryAutoConnect(5) then
+				updateUI()
+				task.spawn(poll)
+			end
+		end)
+	end
+end)
+
 updateUI()
+task.spawn(function()
+	if tryAutoConnect(10) then
+		updateUI()
+		task.spawn(poll)
+	end
+end)

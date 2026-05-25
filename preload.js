@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('api', {
   runSpoofer: data => ipcRenderer.send('run-spoofer', data),
   pauseSpoofer: () => ipcRenderer.send('spoofer-pause'),
   resumeSpoofer: () => ipcRenderer.send('spoofer-resume'),
+  stopSpoofer: () => ipcRenderer.send('spoofer-stop'),
   fetchUserInfo: cookie => ipcRenderer.invoke('fetch-user-info', { cookie }),
   fetchUserGroups: cookie => ipcRenderer.invoke('fetch-user-groups', { cookie }),
   canUploadGroup: (cookie, groupId, apiKey) =>

@@ -1,6 +1,20 @@
 # Changelog
 
-## v1.5.2
+## v1.5.5
+
+- Studio plugin now auto-connects on load with 10 retry attempts
+- Auto-reconnect triggers when widget is opened if not already connected
+- Poll loop automatically attempts reconnection on connection failure
+- Disconnection detection now uses socket close event for instant detection
+- Removed heartbeat polling in favor of native socket event handling
+- Scan state tracking prevents concurrent scan requests (returns 409 if scan in progress)
+- New `/cancel-scan` endpoint allows cancelling active scans
+- Stop button now pauses processing and cancels active scans
+- Scan handler respects cancellation status and terminates gracefully
+- Manual connection button remains as fallback only
+- Fixed undefined variable error in download retry configuration
+
+## 1.5.2
 
 - Run page redesigned into a single unified card with a live log, group selector, and Run Spoofer button
 - Scan and run are now one continuous flow; clicking Run Spoofer immediately begins scanning, downloading, and uploading with no separate steps
