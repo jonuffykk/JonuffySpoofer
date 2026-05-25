@@ -10,19 +10,31 @@ const OWNER = 'jonuffykk';
 const REPO = 'JonuffySpoofer';
 const API_URL = `https://api.github.com/repos/${OWNER}/${REPO}/releases/latest`;
 
-const fetchJson = url => new Promise((res, rej) => {
-  const req = https.get(url, {
-    headers: { 'User-Agent': 'JonuffySpoofer', Accept: 'application/vnd.github+json' },
-  }, r => {
-    let buf = '';
-    r.on('data', d => buf += d);
-    r.on('end', () => {
-      try { res(JSON.parse(buf)); } catch (e) { rej(e); }
+const fetchJson = url =>
+  new Promise((res, rej) => {
+    const req = https.get(
+      url,
+      {
+        headers: { 'User-Agent': 'JonuffySpoofer', Accept: 'application/vnd.github+json' },
+      },
+      r => {
+        let buf = '';
+        r.on('data', d => (buf += d));
+        r.on('end', () => {
+          try {
+            res(JSON.parse(buf));
+          } catch (e) {
+            rej(e);
+          }
+        });
+      }
+    );
+    req.on('error', rej);
+    req.setTimeout(15000, () => {
+      req.destroy();
+      rej(new Error('Timeout'));
     });
   });
-  req.on('error', rej);
-  req.setTimeout(15000, () => { req.destroy(); rej(new Error('Timeout')); });
-});
 
 const semverGt = (a, b) => {
   const pa = a.replace(/^v/, '').split('.').map(Number);
@@ -52,38 +64,58 @@ const getLatestRelease = async () => {
   };
 };
 
-const downloadFile = (url, dest, onProgress) => new Promise((res, rej) => {
-  const dir = path.dirname(dest);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  const file = fs.createWriteStream(dest);
-  let received = 0;
-  const req = https.get(url, { headers: { 'User-Agent': 'JonuffySpoofer' } }, r => {
-    const total = parseInt(r.headers['content-length'] || '0', 10);
-    r.on('data', chunk => {
-      received += chunk.length;
-      file.write(chunk);
-      if (total) onProgress(received, total);
+const downloadFile = (url, dest, onProgress) =>
+  new Promise((res, rej) => {
+    const dir = path.dirname(dest);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const file = fs.createWriteStream(dest);
+    let received = 0;
+    const req = https.get(url, { headers: { 'User-Agent': 'JonuffySpoofer' } }, r => {
+      const total = parseInt(r.headers['content-length'] || '0', 10);
+      r.on('data', chunk => {
+        received += chunk.length;
+        file.write(chunk);
+        if (total) onProgress(received, total);
+      });
+      r.on('end', () => {
+        file.end();
+        res({ ok: true, size: received });
+      });
     });
-    r.on('end', () => {
-      file.end();
-      res({ ok: true, size: received });
+    req.on('error', e => {
+      file.destroy();
+      fs.unlink(dest, () => {});
+      rej(e);
+    });
+    req.setTimeout(60000, () => {
+      req.destroy();
+      fs.unlink(dest, () => {});
+      rej(new Error('Timeout'));
     });
   });
-  req.on('error', e => { file.destroy(); fs.unlink(dest, () => {}); rej(e); });
-  req.setTimeout(60000, () => { req.destroy(); fs.unlink(dest, () => {}); rej(new Error('Timeout')); });
-});
 
 const spawnUpdater = (currentExe, newExe) => {
-  const batPath = path.join(path.dirname(currentExe), `update_${Date.now()}.bat`);
+  if (!fs.existsSync(newExe)) {
+    throw new Error('Update file not found');
+  }
+  const tempDir = require('os').tmpdir();
+  const batPath = path.join(tempDir, `jonuffy_update_${Date.now()}.bat`);
   const bat = [
     '@echo off',
     'timeout /t 2 /nobreak >nul',
     ':wait',
     `tasklist /fi "pid eq ${process.pid}" 2>nul | findstr ${process.pid} >nul && (timeout /t 1 /nobreak >nul & goto wait)`,
-    `move /Y "${newExe}" "${currentExe}"`,
+    `if not exist "${newExe}" goto error`,
+    `copy /Y "${newExe}" "${currentExe}" >nul`,
+    `if errorlevel 1 goto error`,
     `del "${newExe}" 2>nul`,
     `start "" "${currentExe}"`,
-    `del "%~f0"`,
+    `goto end`,
+    ':error',
+    'echo Update failed. Please reinstall manually.',
+    'pause',
+    ':end',
+    `del "%~f0" 2>nul`,
   ].join('\r\n');
   fs.writeFileSync(batPath, bat, 'utf8');
   spawn('cmd.exe', ['/c', batPath], { detached: true, windowsHide: true });

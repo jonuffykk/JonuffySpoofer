@@ -303,8 +303,11 @@ function registerIpcHandlers(getWin, emit) {
         return;
       }
       const dir = path.join(app.getPath('userData'), 'updates');
-      updateDest = path.join(dir, info.assetName || 'JonuffySpoofer.exe');
       await fs.mkdir(dir, { recursive: true });
+      updateDest = path.join(dir, info.assetName || 'JonuffySpoofer.exe');
+      if (fsSync.existsSync(updateDest)) {
+        fsSync.unlinkSync(updateDest);
+      }
       await downloadFile(info.assetUrl, updateDest, (received, total) => {
         emit('update-progress', {
           received,
@@ -321,8 +324,12 @@ function registerIpcHandlers(getWin, emit) {
   ipcMain.handle('apply-update', () => {
     if (!updateDest || !fsSync.existsSync(updateDest))
       return { ok: false, error: 'Update file missing' };
-    spawnUpdater(process.execPath, updateDest);
-    return { ok: true };
+    try {
+      spawnUpdater(process.execPath, updateDest);
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
   });
 }
 
