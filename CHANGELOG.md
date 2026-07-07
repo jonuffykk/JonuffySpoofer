@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.5.7
+
+- Fixed Studio connection endlessly flipping between connected and disconnected
+- Fixed `ReferenceError` on every `/poll` request caused by assigning to an undeclared `lastHeartbeat` under strict mode, which made the local server return HTTP 500 and forced the plugin to drop and reconnect every 2 seconds
+- Reverted the v1.5.5 socket-close disconnection detection, which fired instantly because `HttpService:RequestAsync` opens a fresh non-persistent socket per request and closes it right after each response
+- Reintroduced heartbeat-based connection tracking: each `/poll` refreshes the heartbeat and a monitor only marks the plugin disconnected after roughly three missed polls (~7s)
+- `connected` status update now fires only on real state transitions instead of on every reconnect attempt
+- A `/poll` arriving without an active connection is now treated as an implicit reconnect so the app recovers automatically
+- Heartbeat monitor timer is unref'd so it never keeps the process alive on its own
+
 ## v1.5.6
 
 - Update script now uses temp directory for batch file instead of app directory

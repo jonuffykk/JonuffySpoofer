@@ -3,13 +3,16 @@
 const http = require('http');
 
 const PORT = 28476;
+const POLL_INTERVAL = 2000;
+const HEARTBEAT_TIMEOUT = POLL_INTERVAL * 3 + 1000; // ~7s: miss ~3 polls before dropping
 let server = null;
 let studioConn = null;
 let callbacks = {};
 let pendingMappings = null;
 let pendingScanReq = null;
 let scanHandler = null;
-let studioSocket = null;
+let lastHeartbeat = 0;
+let heartbeatTimer = null;
 let isScanning = false;
 
 const setStudioCallbacks = cb => {
@@ -36,6 +39,27 @@ const parseBody = req =>
     req.on('error', rej);
   });
 
+const markDisconnected = () => {
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer);
+    heartbeatTimer = null;
+  }
+  if (studioConn) {
+    studioConn = null;
+    callbacks.onStatusUpdate?.('disconnected', null);
+  }
+};
+
+const startHeartbeatMonitor = () => {
+  if (heartbeatTimer) return;
+  heartbeatTimer = setInterval(() => {
+    if (studioConn && Date.now() - lastHeartbeat > HEARTBEAT_TIMEOUT) {
+      markDisconnected();
+    }
+  }, POLL_INTERVAL);
+  if (heartbeatTimer.unref) heartbeatTimer.unref();
+};
+
 const reply = (res, status, body) => {
   const data = JSON.stringify(body);
   res.writeHead(status, {
@@ -50,32 +74,31 @@ async function handleRequest(req, res) {
 
   if (url === '/connect' && req.method === 'POST') {
     const body = await parseBody(req);
+    const wasConnected = !!studioConn;
     studioConn = {
       connected: true,
       placeId: body.placeId,
       placeName: body.placeName,
-      connectedAt: Date.now(),
+      connectedAt: studioConn?.connectedAt || Date.now(),
     };
-    studioSocket = req.socket;
-    studioSocket.on('close', () => {
-      if (studioConn) {
-        studioConn = null;
-        studioSocket = null;
-        callbacks.onStatusUpdate?.('disconnected', null);
-      }
-    });
-    callbacks.onStatusUpdate?.('connected', studioConn);
+    lastHeartbeat = Date.now();
+    startHeartbeatMonitor();
+    if (!wasConnected) callbacks.onStatusUpdate?.('connected', studioConn);
     return reply(res, 200, { ok: true });
   }
 
   if (url === '/disconnect' && req.method === 'POST') {
-    studioConn = null;
-    callbacks.onStatusUpdate?.('disconnected', null);
+    markDisconnected();
     return reply(res, 200, { ok: true });
   }
 
   if (url === '/poll' && req.method === 'GET') {
     lastHeartbeat = Date.now();
+    if (!studioConn) {
+      studioConn = { connected: true, placeId: null, placeName: null, connectedAt: Date.now() };
+      startHeartbeatMonitor();
+      callbacks.onStatusUpdate?.('connected', studioConn);
+    }
     const resp = {};
     if (pendingScanReq) {
       resp.scanRequest = pendingScanReq;
