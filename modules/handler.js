@@ -23,14 +23,19 @@ const {
   canUploadToGroup,
   downloadAsset,
   uploadAsset,
-  loadSession,
-  clearSession,
   loadHistory,
   clearHistory,
   hKey,
   rememberMapping,
 } = require('./roblox');
-const { getLatestRelease, downloadFile, spawnUpdater } = require('./updater');
+const {
+  getLatestRelease,
+  downloadFile,
+  spawnUpdater,
+  semverGt,
+  sha256File,
+  expectedChecksum,
+} = require('./updater');
 
 let paused = false;
 let pauseQueue = [];
@@ -56,17 +61,6 @@ const ALLOWED_HOSTS = new Set([
   'publish.roblox.com',
   'www.roblox.com',
 ]);
-
-const semverGt = (a, b) => {
-  const pa = a.replace(/^v/, '').split('.').map(Number);
-  const pb = b.replace(/^v/, '').split('.').map(Number);
-  for (let i = 0; i < 3; i++) {
-    const d = (pa[i] || 0) - (pb[i] || 0);
-    if (d > 0) return true;
-    if (d < 0) return false;
-  }
-  return false;
-};
 
 const pluginsDir = () =>
   path.join(
@@ -181,35 +175,19 @@ function registerIpcHandlers(getWin, emit) {
       });
     } catch {}
   });
-  ipcMain.handle('check-session', loadSession);
-  ipcMain.on('clear-session', clearSession);
-
   ipcMain.handle('clear-history', async () => {
-    await clearSession();
     await clearHistory();
     return { ok: true };
   });
 
   ipcMain.handle('check-updates', async () => {
     try {
-      const current = app.getVersion();
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 8000);
-      const r = await fetch(
-        'https://api.github.com/repos/jonuffykk/JonuffySpoofer/releases/latest',
-        {
-          headers: { 'User-Agent': 'JonuffySpoofer', Accept: 'application/vnd.github+json' },
-          signal: ctrl.signal,
-        }
-      ).finally(() => clearTimeout(t));
-      if (!r.ok) return { error: `HTTP ${r.status}` };
-      const data = await r.json();
-      const latest = (data.tag_name || '').replace(/^v/, '');
+      const info = await getLatestRelease();
       return {
-        current,
-        latest: data.tag_name || latest,
-        upToDate: !semverGt(latest, current),
-        releaseUrl: data.html_url || 'https://github.com/jonuffykk/JonuffySpoofer/releases/latest',
+        current: info.current,
+        latest: info.latest,
+        upToDate: !info.hasUpdate,
+        releaseUrl: info.releaseUrl,
       };
     } catch {
       return { error: 'Network error' };
@@ -308,14 +286,30 @@ function registerIpcHandlers(getWin, emit) {
       if (fsSync.existsSync(updateDest)) {
         fsSync.unlinkSync(updateDest);
       }
-      await downloadFile(info.assetUrl, updateDest, (received, total) => {
+      const dl = await downloadFile(info.assetUrl, updateDest, (received, total) => {
         emit('update-progress', {
           received,
           total,
           pct: total ? Math.round((received / total) * 100) : 0,
         });
       });
-      emit('update-done', { ok: true, path: updateDest });
+      const onDisk = fsSync.existsSync(updateDest) ? fsSync.statSync(updateDest).size : 0;
+      if (onDisk < 1024 * 1024 || (info.assetSize && Math.abs(onDisk - info.assetSize) > 4096)) {
+        if (fsSync.existsSync(updateDest)) fsSync.unlinkSync(updateDest);
+        emit('update-done', { ok: false, error: 'Download incomplete or corrupted' });
+        return;
+      }
+      if (info.checksumUrl) {
+        try {
+          const expected = await expectedChecksum(info.checksumUrl, info.assetName);
+          if (expected && (await sha256File(updateDest)) !== expected) {
+            fsSync.unlinkSync(updateDest);
+            emit('update-done', { ok: false, error: 'Checksum mismatch — download rejected' });
+            return;
+          }
+        } catch {}
+      }
+      emit('update-done', { ok: true, path: updateDest, size: dl?.size ?? onDisk });
     } catch (err) {
       emit('update-done', { ok: false, error: err.message });
     }
@@ -325,6 +319,14 @@ function registerIpcHandlers(getWin, emit) {
     if (!updateDest || !fsSync.existsSync(updateDest))
       return { ok: false, error: 'Update file missing' };
     try {
+      const header = Buffer.alloc(2);
+      const fd = fsSync.openSync(updateDest, 'r');
+      fsSync.readSync(fd, header, 0, 2, 0);
+      fsSync.closeSync(fd);
+      if (header.toString('latin1') !== 'MZ') {
+        fsSync.unlinkSync(updateDest);
+        return { ok: false, error: 'Update file is not a valid executable' };
+      }
       spawnUpdater(process.execPath, updateDest);
       return { ok: true };
     } catch (err) {
@@ -355,6 +357,9 @@ async function runPipeline(data, emit) {
     return fail('Enable Spoofing is OFF and Download-Only is not enabled.');
   if (data.groupId && !/^\d+$/.test(String(data.groupId).trim()))
     return fail(`Invalid Group ID "${data.groupId}".`);
+  const overridePlaceId = String(data.overridePlaceId || '').trim();
+  if (overridePlaceId && !/^\d+$/.test(overridePlaceId))
+    return fail(`Invalid Place ID override "${data.overridePlaceId}".`);
   if (!data.downloadOnly && !data.apiKey) return fail('Uploads require an Open Cloud API key.');
 
   const cookie = data.robloxCookie?.trim() || '';
@@ -425,6 +430,8 @@ async function runPipeline(data, emit) {
       1000
     ).catch(() => []);
     pids = pids.length ? [...new Set([...pids, ...FALLBACK_PLACES])] : FALLBACK_PLACES.slice();
+    if (overridePlaceId)
+      pids = [overridePlaceId, ...pids.filter(p => String(p) !== overridePlaceId)];
 
     let dlUrl = null;
     for (const pid of pids) {

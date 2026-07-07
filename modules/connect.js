@@ -4,7 +4,7 @@ const http = require('http');
 
 const PORT = 28476;
 const POLL_INTERVAL = 2000;
-const HEARTBEAT_TIMEOUT = POLL_INTERVAL * 3 + 1000; // ~7s: miss ~3 polls before dropping
+const HEARTBEAT_TIMEOUT = POLL_INTERVAL * 3 + 1000;
 let server = null;
 let studioConn = null;
 let callbacks = {};
@@ -152,9 +152,16 @@ async function handleRequest(req, res) {
 }
 
 function startServer() {
+  if (server) return;
   server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     handleRequest(req, res).catch(() => reply(res, 500, { error: 'Internal error' }));
+  });
+  server.on('error', err => {
+    server = null;
+    if (err.code === 'EADDRINUSE') {
+      setTimeout(startServer, 3000);
+    }
   });
   server.listen(PORT, '127.0.0.1');
 }

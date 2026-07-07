@@ -58,12 +58,11 @@ const classifyError = err => {
 const parseAssetInput = input => {
   if (!input || typeof input !== 'string') return [];
   const rDash = /^\s*(\d+)\s+-\s+(.+?)\s+-\s+([GU]):\s*(\d+)\s*$/;
-  const rPipe = /^\s*(\d+)\s*\|\s*([^\|]+)\s*\|\s*([GU]):(\d+)\s*$/;
   const seen = new Set();
   return input.split('\n').flatMap(line => {
     line = line.trim();
     if (!line || line.startsWith('--') || line.startsWith('#')) return [];
-    const m = line.match(rDash) || line.match(rPipe);
+    const m = line.match(rDash);
     if (!m || seen.has(m[1])) return [];
     seen.add(m[1]);
     return [
@@ -316,10 +315,8 @@ const uploadAsset = async (filePath, name, groupId, assetTypeName, apiKey, userI
   }
   if (!apiKey)
     return { ok: false, error: `${assetTypeName} uploads require an Open Cloud API key.` };
-  const isAudio = assetTypeName === 'Audio';
   const creator = groupId ? { groupId: String(groupId) } : { userId: String(userId) };
-  const fileType = isAudio ? 'audio/ogg' : 'model/x-rbxm';
-  const fileName = `${(name || 'asset').replace(/[<>:"/\\|?*\r\n]/g, '_').substring(0, 100)}${isAudio ? '.ogg' : '.rbxm'}`;
+  const fileName = `${(name || 'asset').replace(/[<>:"/\\|?*\r\n]/g, '_').substring(0, 100)}.rbxm`;
   const meta = {
     assetType: assetTypeName,
     displayName: name,
@@ -331,7 +328,7 @@ const uploadAsset = async (filePath, name, groupId, assetTypeName, apiKey, userI
   for (let attempt = 0; attempt <= 4; attempt++) {
     const fd = new FormData();
     fd.append('request', JSON.stringify(meta));
-    fd.append('fileContent', new Blob([buf], { type: fileType }), fileName);
+    fd.append('fileContent', new Blob([buf], { type: 'model/x-rbxm' }), fileName);
     await waitRateLimit();
     response = await fetch('https://apis.roblox.com/assets/v1/assets', {
       method: 'POST',
@@ -380,17 +377,7 @@ const uploadAsset = async (filePath, name, groupId, assetTypeName, apiKey, userI
   throw new Error(`Unexpected API response: ${JSON.stringify(responseData)}`);
 };
 
-const sessionPath = () => path.join(app.getPath('userData'), 'jonuffy_state.json');
 const historyPath = () => path.join(app.getPath('userData'), 'jonuffy_mappings.json');
-
-const loadSession = async () => {
-  try {
-    return JSON.parse(await fs.readFile(sessionPath(), 'utf8'));
-  } catch {
-    return null;
-  }
-};
-const clearSession = () => fs.unlink(sessionPath()).catch(() => {});
 
 const loadHistory = async () => {
   try {
@@ -437,8 +424,6 @@ module.exports = {
   canUploadToGroup,
   downloadAsset,
   uploadAsset,
-  loadSession,
-  clearSession,
   loadHistory,
   clearHistory,
   hKey,

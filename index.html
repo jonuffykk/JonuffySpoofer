@@ -865,7 +865,10 @@
             style="width: 0%"
           ></div>
         </div>
-        <p id="updatePct" class="text-[10px] text-gray-400 font-mono text-right mb-4">0%</p>
+        <div class="flex justify-between items-center text-[10px] text-gray-400 font-mono mb-4">
+          <span id="updateSpeed"></span>
+          <span id="updatePct">0%</span>
+        </div>
         <div id="updateActions" class="flex gap-2">
           <button
             id="btnDownloadUpdate"
@@ -1184,7 +1187,6 @@
           downloadOnly: s.downloadOnly,
           downloadFolder: $('downloadFolder').value,
           enableSpoofing: s.enableSpoofing,
-          spoofSounds: false,
           maxPlaceIds: +$('maxPlaceIds').value || 10,
           maxPlaceIdRetries: +$('maxPlaceIdRetries').value || 3,
           uploadRetries: +$('uploadRetries').value || 3,
@@ -1336,9 +1338,24 @@
         $('modalUpdate').classList.remove('flex');
       });
 
+      const fmtBytes = n => {
+        if (!n || n < 0) return '0 B';
+        const u = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.min(Math.floor(Math.log(n) / Math.log(1024)), u.length - 1);
+        return (n / 1024 ** i).toFixed(i ? 1 : 0) + ' ' + u[i];
+      };
+
+      let dlTime = 0,
+        dlBytes = 0,
+        dlSpeed = 0;
+
       $('btnDownloadUpdate').addEventListener('click', async () => {
         hideEl($('updateActions'));
         $('updateSubtitle').textContent = 'Downloading...';
+        dlTime = 0;
+        dlBytes = 0;
+        dlSpeed = 0;
+        $('updateSpeed').textContent = '';
         window.api?.downloadUpdate();
       });
 
@@ -1346,13 +1363,28 @@
         await window.api?.applyUpdate();
       });
 
-      window.api?.onUpdateProgress(({ pct }) => {
+      window.api?.onUpdateProgress(({ received, pct }) => {
         $('updateBar').style.width = pct + '%';
         $('updatePct').textContent = pct + '%';
         $('updateSubtitle').textContent = 'Downloading...';
+        const now = performance.now();
+        if (!dlTime) {
+          dlTime = now;
+          dlBytes = received;
+          return;
+        }
+        const dt = (now - dlTime) / 1000;
+        if (dt >= 0.3) {
+          const inst = (received - dlBytes) / dt;
+          dlSpeed = dlSpeed ? dlSpeed * 0.7 + inst * 0.3 : inst;
+          dlTime = now;
+          dlBytes = received;
+          $('updateSpeed').textContent = fmtBytes(dlSpeed) + '/s';
+        }
       });
 
       window.api?.onUpdateDone(({ ok, error }) => {
+        $('updateSpeed').textContent = '';
         if (!ok) {
           $('updateSubtitle').textContent = error || 'Download failed';
           showEl($('updateActions'));

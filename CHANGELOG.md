@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.6.0
+
+- Rebuilt the Studio connection layer around a heartbeat instead of raw socket state, eliminating the constant connect/disconnect flicker
+- Fixed the local server returning HTTP 500 on every poll, which forced the plugin to drop and reconnect every two seconds
+- Connection is now considered lost only after three consecutive missed polls, and a poll from a plugin the app lost track of silently restores the session
+- Connection status changes are emitted only on real transitions, so the banner no longer thrashes during reconnects
+- Enforced a single running instance; launching the app again focuses the existing window instead of contending for the local port
+- Local server recovers automatically if the port is briefly held during a restart
+- Fixed auto-update that reported success without replacing anything: the downloader now follows GitHub's asset redirect instead of saving an empty response as the installer
+- Fixed the installer overwriting the temporary extracted build rather than the real portable executable, so updates now persist after restart and no longer reopen a stale window
+- Downloads stream to disk and complete only once fully flushed; non-success responses are treated as failures
+- Downloaded installer is validated by size and executable header before it is applied, and rejected if incomplete or corrupted
+- Install step retries while the executable is briefly locked during shutdown
+- Update check surfaces a clear error when the release feed is unreachable instead of silently reporting up to date
+- Update download now shows live transfer speed alongside the progress bar
+- Update installer is now verified against a SHA-256 checksum published with each release and rejected on mismatch
+- Releases now publish a `SHA256SUMS.txt` asset generated during the build
+- Place ID override is functional again and takes priority when resolving asset download locations
+- Removed the dead session-persistence layer, the unused audio upload path, the redundant place-id parser branch, and the duplicated version and release-check logic
+- Added a unit test suite (`npm test`) covering version comparison, cookie parsing, asset parsing, error classification, and checksum handling
+
 ## v1.5.7
 
 - Fixed Studio connection endlessly flipping between connected and disconnected
@@ -9,6 +30,11 @@
 - `connected` status update now fires only on real state transitions instead of on every reconnect attempt
 - A `/poll` arriving without an active connection is now treated as an implicit reconnect so the app recovers automatically
 - Heartbeat monitor timer is unref'd so it never keeps the process alive on its own
+- Fixed auto-update reporting success without actually updating; the downloader now follows GitHub's 302 redirect to `objects.githubusercontent.com` instead of saving the empty redirect response as the installer
+- Fixed the update installer overwriting the temporary extracted executable instead of the real portable launcher; it now targets `PORTABLE_EXECUTABLE_FILE`, so the update persists after restart and no longer relaunches into a stale window
+- Download now streams to disk and resolves only after the file is fully flushed, with non-200 responses treated as failures
+- Downloaded installer is size-validated against the release asset before applying; a truncated or corrupted download is rejected instead of installed
+- Update batch script retries the copy up to ten times to handle the brief file lock during portable shutdown
 
 ## v1.5.6
 

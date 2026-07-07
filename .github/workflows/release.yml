@@ -54,12 +54,19 @@ jobs:
       - run: npm run build -- --win portable
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate checksums
+        shell: bash
+        run: |
+          cd dist
+          sha256sum *.exe > SHA256SUMS.txt
+          cat SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
           name: dist
           path: |
             dist/*.exe
             dist/*.rbxmx
+            dist/SHA256SUMS.txt
           if-no-files-found: error
 
   release:

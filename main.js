@@ -5,6 +5,19 @@ const { setupAppLifecycle, getMainWindow } = require('./modules/window');
 const { registerIpcHandlers } = require('./modules/handler');
 const { startServer, setStudioCallbacks } = require('./modules/connect');
 
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+  return;
+}
+
+app.on('second-instance', () => {
+  const win = getMainWindow();
+  if (win) {
+    if (win.isMinimized()) win.restore();
+    win.focus();
+  }
+});
+
 const send = (channel, payload) => {
   const win = getMainWindow();
   if (win && !win.isDestroyed()) win.webContents?.send(channel, payload);
