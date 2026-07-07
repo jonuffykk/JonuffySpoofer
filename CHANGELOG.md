@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.6.1
+
+- The Upload Concurrency setting is now honored — uploads run through an independent limiter instead of silently inheriting the download concurrency
+- Stop now aborts in-flight downloads and uploads immediately and cancels pending retries and cooldowns, rather than only halting new work
+- Aborted transfers no longer count as failures, and the run ends with a clear "Stopped" status
+- Extended the unit test suite to cover the concurrency limiter
+
 ## v1.6.0
 
 - Rebuilt the Studio connection layer around a heartbeat instead of raw socket state, eliminating the constant connect/disconnect flicker

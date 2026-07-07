@@ -15,6 +15,7 @@ const {
   retryAsync,
   retryWithCooldown,
   runWithConcurrency,
+  createLimiter,
   clearDir,
   getPlaceIds,
   getAuthUserId,
@@ -39,6 +40,7 @@ const {
 
 let paused = false;
 let pauseQueue = [];
+let runState = null;
 const pauseCheck = () => (paused ? new Promise(r => pauseQueue.push(r)) : Promise.resolve());
 const doPause = () => {
   paused = true;
@@ -167,7 +169,12 @@ function registerIpcHandlers(getWin, emit) {
   ipcMain.on('spoofer-pause', doPause);
   ipcMain.on('spoofer-resume', doResume);
   ipcMain.on('spoofer-stop', () => {
-    doPause();
+    if (runState) {
+      runState.aborted = true;
+      runState.controller.abort();
+    }
+    doResume();
+    emit('status', 'Stopping...');
     try {
       fetch('http://127.0.0.1:28476/cancel-scan', {
         method: 'POST',
@@ -255,6 +262,7 @@ function registerIpcHandlers(getWin, emit) {
 
   ipcMain.on('run-spoofer', async (_e, data) => {
     doResume();
+    runState = { aborted: false, controller: new AbortController() };
     try {
       await runPipeline(data, emit);
     } catch (err) {
@@ -375,10 +383,14 @@ async function runPipeline(data, emit) {
     timeoutMs: 30000,
     retries: 3,
     retryDelayMs: 3000,
+    signal: abortSignal,
   };
   const UL_RETRIES = parseInt(data.uploadRetries) || 3;
   const UL_DELAY = parseInt(data.uploadRetryDelay) || 5000;
   const dlConcurrency = Math.min(parseInt(data.downloadConcurrency) || 10, 25);
+  const ulConcurrency = Math.min(parseInt(data.uploadConcurrency) || 10, 25);
+  const abortSignal = runState?.controller?.signal;
+  const uploadLimit = createLimiter(ulConcurrency);
 
   let authUserId = null;
   if (!data.downloadOnly) {
@@ -407,7 +419,9 @@ async function runPipeline(data, emit) {
   const FALLBACK_PLACES = [99840799534728, 606849621, 155615604, 5704517949];
 
   const processEntry = async entry => {
+    if (runState?.aborted) return;
     await sleep(100 + Math.floor(Math.random() * 150));
+    if (runState?.aborted) return;
     if (!data.downloadOnly && isOwnedByTarget(entry)) {
       log(`OWN:${entry.id}:${entry.name}`);
       totalDone++;
@@ -435,9 +449,11 @@ async function runPipeline(data, emit) {
 
     let dlUrl = null;
     for (const pid of pids) {
+      if (runState?.aborted) return;
       try {
         const ctrl = new AbortController();
         const t = setTimeout(() => ctrl.abort(), 15000);
+        const signal = abortSignal ? AbortSignal.any([ctrl.signal, abortSignal]) : ctrl.signal;
         const resp = await fetch('https://assetdelivery.roblox.com/v2/assets/batch', {
           method: 'POST',
           headers: {
@@ -449,7 +465,7 @@ async function runPipeline(data, emit) {
           body: JSON.stringify([
             { requestId: String(entry.id), assetType, assetId: String(entry.id) },
           ]),
-          signal: ctrl.signal,
+          signal,
         }).finally(() => clearTimeout(t));
         if (resp.ok) {
           const locs = await resp.json();
@@ -471,6 +487,7 @@ async function runPipeline(data, emit) {
       dlResult = await downloadAsset(altUrl, cookie, filePath, dlOpts);
     }
     if (!dlResult?.ok) {
+      if (runState?.aborted) return;
       log(`FAIL_DL:${entry.id}:${entry.name}:${dlResult?.error || 'unknown'}`);
       totalFailed++;
       emit('progress', { done: totalDone, failed: totalFailed });
@@ -484,18 +501,31 @@ async function runPipeline(data, emit) {
       return;
     }
 
+    if (runState?.aborted) return;
     log(`UL:${entry.id}:${entry.name}`);
     await pauseCheck();
+    if (runState?.aborted) return;
 
     try {
-      const ulResult = await retryWithCooldown(
-        () =>
-          uploadAsset(filePath, entry.name, groupId, assetType, data.apiKey || null, authUserId),
-        UL_RETRIES,
-        UL_DELAY,
-        (attempt, max, err) =>
-          log(`WARN:${entry.id}:${classifyError(err).category} (${attempt}/${max})`),
-        rem => emit('status', `Cooldown ${rem}s — ${entry.name}`)
+      const ulResult = await uploadLimit(() =>
+        retryWithCooldown(
+          () =>
+            uploadAsset(
+              filePath,
+              entry.name,
+              groupId,
+              assetType,
+              data.apiKey || null,
+              authUserId,
+              abortSignal
+            ),
+          UL_RETRIES,
+          UL_DELAY,
+          (attempt, max, err) =>
+            log(`WARN:${entry.id}:${classifyError(err).category} (${attempt}/${max})`),
+          rem => emit('status', `Cooldown ${rem}s — ${entry.name}`),
+          abortSignal
+        )
       );
 
       if (ulResult?.ok && ulResult.assetId) {
@@ -509,6 +539,7 @@ async function runPipeline(data, emit) {
         totalFailed++;
       }
     } catch (err) {
+      if (runState?.aborted) return;
       log(`FAIL_UL:${entry.id}:${entry.name}:${classifyError(err).category}`);
       totalFailed++;
     }
@@ -565,6 +596,11 @@ async function runPipeline(data, emit) {
     const processLoop = async () => {
       const processed = new Set();
       while (!scanDone || processed.size < scanQueue.length) {
+        if (runState?.aborted) {
+          scanDone = true;
+          resolveQueue?.();
+          break;
+        }
         const pending = scanQueue.filter(e => !processed.has(e.id));
         if (pending.length) {
           await runWithConcurrency(pending, dlConcurrency, async entry => {
@@ -609,9 +645,11 @@ async function runPipeline(data, emit) {
   log(`SUMMARY:${totalDone}:${totalFailed}:${total}`);
   emit(
     'status',
-    `Done — ${totalDone}/${total} succeeded${totalFailed > 0 ? `, ${totalFailed} failed` : ''}`
+    runState?.aborted
+      ? `Stopped — ${totalDone}/${total} completed`
+      : `Done — ${totalDone}/${total} succeeded${totalFailed > 0 ? `, ${totalFailed} failed` : ''}`
   );
-  emit('result', { ok: totalDone > 0, totalDone, totalFailed });
+  emit('result', { ok: !runState?.aborted && totalDone > 0, totalDone, totalFailed });
 }
 
 module.exports = { registerIpcHandlers };

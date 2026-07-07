@@ -12,6 +12,7 @@ const {
   parseAssetInput,
   classifyError,
   sanitizeFilename,
+  createLimiter,
 } = require('../modules/roblox');
 const { semverGt, sha256File, expectedChecksum } = require('../modules/updater');
 
@@ -72,6 +73,22 @@ test('sha256File hashes file contents', async () => {
   } finally {
     fs.unlinkSync(p);
   }
+});
+
+test('createLimiter caps concurrent executions', async () => {
+  const limit = createLimiter(2);
+  let active = 0;
+  let peak = 0;
+  const task = () =>
+    limit(async () => {
+      active++;
+      peak = Math.max(peak, active);
+      await new Promise(r => setTimeout(r, 15));
+      active--;
+    });
+  await Promise.all(Array.from({ length: 6 }, task));
+  assert.equal(peak, 2);
+  assert.equal(active, 0);
 });
 
 test('expectedChecksum finds the asset hash from a SHA256SUMS feed', async () => {

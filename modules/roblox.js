@@ -88,21 +88,47 @@ const retryAsync = async (fn, retries = 3, delayMs = 1000) => {
   }
 };
 
-const retryWithCooldown = async (fn, retries, delayMs, onFail, onTick) => {
+const retryWithCooldown = async (fn, retries, delayMs, onFail, onTick, signal) => {
   const max = Math.max(1, retries);
   for (let i = 1; i <= max; i++) {
+    if (signal?.aborted) throw new Error('aborted');
     try {
       return await fn();
     } catch (err) {
+      if (signal?.aborted) throw new Error('aborted');
       onFail?.(i, max, err);
       if (i >= max) throw err;
       const secs = Math.ceil(delayMs / 1000);
       for (let r = secs; r > 0; r--) {
+        if (signal?.aborted) throw new Error('aborted');
         onTick?.(r, secs, i + 1, max, err);
         await sleep(1000);
       }
     }
   }
+};
+
+const createLimiter = max => {
+  const n = Math.max(1, max | 0);
+  let active = 0;
+  const queue = [];
+  const next = () => {
+    if (active >= n || !queue.length) return;
+    active++;
+    const { fn, res, rej } = queue.shift();
+    Promise.resolve()
+      .then(fn)
+      .then(res, rej)
+      .finally(() => {
+        active--;
+        next();
+      });
+  };
+  return fn =>
+    new Promise((res, rej) => {
+      queue.push({ fn, res, rej });
+      next();
+    });
 };
 
 const runWithConcurrency = async (items, limit, worker) => {
@@ -256,10 +282,13 @@ const downloadAsset = async (url, cookie, filePath, opts = {}) => {
   const retryDelayMs = opts.retryDelayMs > 0 ? opts.retryDelayMs : 3000;
 
   for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    if (opts.signal?.aborted) return { ok: false, error: 'aborted' };
     let stream = null;
     try {
       const ctrl = new AbortController();
       const t = setTimeout(() => ctrl.abort(), timeoutMs);
+      const onAbort = () => ctrl.abort();
+      opts.signal?.addEventListener('abort', onAbort, { once: true });
       let resp;
       try {
         resp = await fetch(url, {
@@ -269,6 +298,7 @@ const downloadAsset = async (url, cookie, filePath, opts = {}) => {
         });
       } finally {
         clearTimeout(t);
+        opts.signal?.removeEventListener('abort', onAbort);
       }
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       if (!resp.body) throw new Error('No response body');
@@ -300,13 +330,14 @@ const downloadAsset = async (url, cookie, filePath, opts = {}) => {
       try {
         if (fsSync.existsSync(filePath)) fsSync.unlinkSync(filePath);
       } catch {}
+      if (opts.signal?.aborted) return { ok: false, error: 'aborted' };
       if (!retryable || attempt > retries) return { ok: false, error: msg };
       await sleep(retryDelayMs + Math.floor(Math.random() * 2000));
     }
   }
 };
 
-const uploadAsset = async (filePath, name, groupId, assetTypeName, apiKey, userId) => {
+const uploadAsset = async (filePath, name, groupId, assetTypeName, apiKey, userId, signal) => {
   let buf;
   try {
     buf = await fs.readFile(filePath);
@@ -326,6 +357,7 @@ const uploadAsset = async (filePath, name, groupId, assetTypeName, apiKey, userI
 
   let response, responseData;
   for (let attempt = 0; attempt <= 4; attempt++) {
+    if (signal?.aborted) throw new Error('aborted');
     const fd = new FormData();
     fd.append('request', JSON.stringify(meta));
     fd.append('fileContent', new Blob([buf], { type: 'model/x-rbxm' }), fileName);
@@ -334,6 +366,7 @@ const uploadAsset = async (filePath, name, groupId, assetTypeName, apiKey, userI
       method: 'POST',
       headers: { 'x-api-key': apiKey },
       body: fd,
+      signal,
     });
     if (response.status === 429) {
       if (attempt >= 4) throw new Error('Rate limit hit after 4 retries.');
@@ -362,8 +395,9 @@ const uploadAsset = async (filePath, name, groupId, assetTypeName, apiKey, userI
   if (responseData.path && !responseData.done) {
     const pollUrl = `https://apis.roblox.com/${responseData.path.startsWith('assets/') ? responseData.path : `assets/v1/${responseData.path}`}`;
     for (let i = 0; i < 30; i++) {
+      if (signal?.aborted) throw new Error('aborted');
       await sleep(1000);
-      const poll = await fetch(pollUrl, { headers: { 'x-api-key': apiKey } });
+      const poll = await fetch(pollUrl, { headers: { 'x-api-key': apiKey }, signal });
       const d = await poll.json();
       if (!d.done) continue;
       if (d.error)
@@ -416,6 +450,7 @@ module.exports = {
   retryAsync,
   retryWithCooldown,
   runWithConcurrency,
+  createLimiter,
   clearDir,
   getPlaceIds,
   getAuthUserId,
