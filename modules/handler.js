@@ -377,6 +377,7 @@ async function runPipeline(data, emit) {
   if (!hasCustomDir) await clearDir(tmpDir);
   await fs.mkdir(tmpDir, { recursive: true }).catch(() => {});
 
+  const abortSignal = runState?.controller?.signal;
   const maxPlaceIds = parseInt(data.maxPlaceIds) || 10;
   const maxPlaceRetries = parseInt(data.maxPlaceIdRetries) || 3;
   const dlOpts = {
@@ -389,7 +390,6 @@ async function runPipeline(data, emit) {
   const UL_DELAY = parseInt(data.uploadRetryDelay) || 5000;
   const dlConcurrency = Math.min(parseInt(data.downloadConcurrency) || 10, 25);
   const ulConcurrency = Math.min(parseInt(data.uploadConcurrency) || 10, 25);
-  const abortSignal = runState?.controller?.signal;
   const uploadLimit = createLimiter(ulConcurrency);
 
   let authUserId = null;

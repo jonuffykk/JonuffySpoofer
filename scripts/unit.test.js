@@ -7,6 +7,23 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 
+const ipc = {};
+const electronPath = require.resolve('electron');
+require.cache[electronPath] = {
+  id: electronPath,
+  filename: electronPath,
+  loaded: true,
+  exports: {
+    app: { getPath: () => os.tmpdir(), getVersion: () => '1.6.2', quit() {} },
+    ipcMain: {
+      on: (ch, fn) => (ipc[ch] = fn),
+      handle: (ch, fn) => (ipc[ch] = fn),
+    },
+    dialog: {},
+    shell: {},
+  },
+};
+
 const {
   buildCookieHeader,
   parseAssetInput,
@@ -89,6 +106,36 @@ test('createLimiter caps concurrent executions', async () => {
   await Promise.all(Array.from({ length: 6 }, task));
   assert.equal(peak, 2);
   assert.equal(active, 0);
+});
+
+test('run pipeline reaches the Studio check without initialization errors', async () => {
+  const logs = [];
+  const { registerIpcHandlers } = require('../modules/handler');
+  registerIpcHandlers(
+    () => null,
+    (channel, payload) => {
+      if (channel === 'log-line') logs.push(payload);
+    }
+  );
+  const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'jspoofer_run_'));
+  try {
+    await ipc['run-spoofer'](null, {
+      robloxCookie: 'ABC123',
+      apiKey: 'key',
+      downloadOnly: true,
+      downloadFolder: folder,
+    });
+    assert.ok(
+      !logs.some(l => /before initialization|is not defined/i.test(l)),
+      `pipeline threw an initialization error: ${logs.join(' | ')}`
+    );
+    assert.ok(
+      logs.some(l => l.startsWith('ERR:Studio not connected')),
+      `expected the Studio guard to be reached, got: ${logs.join(' | ')}`
+    );
+  } finally {
+    fs.rmSync(folder, { recursive: true, force: true });
+  }
 });
 
 test('expectedChecksum finds the asset hash from a SHA256SUMS feed', async () => {

@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.6.2
+
+- Fixed every run failing instantly with "Cannot access 'abortSignal' before initialization", introduced in 1.6.1 by declaring the abort signal after the download options that consume it
+- Added a pipeline smoke test that executes a run end to end through the Studio check, which catches this class of initialization error before release
+- Rewrote the update installer to run completely hidden through a Windows Script Host launcher, eliminating the stray console windows that appeared during an update and could hang under Windows Terminal on Windows 11
+- Replaced the fragile `tasklist`/`findstr` process wait with `Wait-Process`, which previously could loop forever when the process id happened to match unrelated output
+- The executable swap now retries for up to twenty seconds to ride out the brief file lock held by the portable launcher during shutdown
+- Removed the interactive failure prompt that left a window open; update errors are now written to `updates/update.log`
+- Installer helper scripts delete themselves after finishing
+
 ## v1.6.1
 
 - The Upload Concurrency setting is now honored — uploads run through an independent limiter instead of silently inheriting the download concurrency

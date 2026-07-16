@@ -155,34 +155,50 @@ const spawnUpdater = (currentExe, newExe) => {
     throw new Error('Update file not found');
   }
   currentExe = process.env.PORTABLE_EXECUTABLE_FILE || currentExe;
-  const tempDir = require('os').tmpdir();
-  const batPath = path.join(tempDir, `jonuffy_update_${Date.now()}.bat`);
-  const bat = [
-    '@echo off',
-    'timeout /t 2 /nobreak >nul',
-    ':wait',
-    `tasklist /fi "pid eq ${process.pid}" 2>nul | findstr ${process.pid} >nul && (timeout /t 1 /nobreak >nul & goto wait)`,
-    `if not exist "${newExe}" goto error`,
-    'set /a tries=0',
-    ':copy',
-    `copy /Y "${newExe}" "${currentExe}" >nul`,
-    'if not errorlevel 1 goto done',
-    'set /a tries+=1',
-    'if %tries% geq 10 goto error',
-    'timeout /t 1 /nobreak >nul',
-    'goto copy',
-    ':done',
-    `del "${newExe}" 2>nul`,
-    `start "" "${currentExe}"`,
-    `goto end`,
-    ':error',
-    'echo Update failed. Please reinstall manually.',
-    'pause',
-    ':end',
-    `del "%~f0" 2>nul`,
+  const dir = path.dirname(newExe);
+  const stamp = Date.now();
+  const ps1Path = path.join(dir, `update_${stamp}.ps1`);
+  const vbsPath = path.join(dir, `update_${stamp}.vbs`);
+  const logPath = path.join(dir, 'update.log');
+  const q = s => String(s).replace(/'/g, "''");
+
+  const ps1 = [
+    "$ErrorActionPreference = 'SilentlyContinue'",
+    `$waitPid = ${process.pid}`,
+    `$src = '${q(newExe)}'`,
+    `$dst = '${q(currentExe)}'`,
+    `$log = '${q(logPath)}'`,
+    `$self = '${q(ps1Path)}'`,
+    `$vbs = '${q(vbsPath)}'`,
+    'function Log($m) { "$(Get-Date -Format o)  $m" | Out-File -FilePath $log -Append -Encoding utf8 }',
+    'try { Wait-Process -Id $waitPid -Timeout 60 -ErrorAction Stop } catch {}',
+    '$ok = $false',
+    'for ($i = 0; $i -lt 40; $i++) {',
+    '  try {',
+    '    Copy-Item -LiteralPath $src -Destination $dst -Force -ErrorAction Stop',
+    '    $ok = $true',
+    '    break',
+    '  } catch {',
+    '    Start-Sleep -Milliseconds 500',
+    '  }',
+    '}',
+    'if ($ok) {',
+    '  Remove-Item -LiteralPath $src -Force',
+    '  Start-Process -FilePath $dst',
+    '} else {',
+    '  Log "Failed to replace $dst after 40 attempts"',
+    '}',
+    'Remove-Item -LiteralPath $vbs -Force',
+    'Remove-Item -LiteralPath $self -Force',
   ].join('\r\n');
-  fs.writeFileSync(batPath, bat, 'utf8');
-  spawn('cmd.exe', ['/c', batPath], { detached: true, windowsHide: true });
+
+  const vbs =
+    'CreateObject("WScript.Shell").Run ' +
+    `"powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ""${ps1Path}""", 0, False`;
+
+  fs.writeFileSync(ps1Path, ps1, 'utf8');
+  fs.writeFileSync(vbsPath, vbs, 'utf8');
+  spawn('wscript.exe', [vbsPath], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
   app.quit();
 };
 
